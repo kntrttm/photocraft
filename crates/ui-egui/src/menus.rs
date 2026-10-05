@@ -785,6 +785,9 @@ fn render_level(ui: &mut egui::Ui, items: &[&MenuItem], depth: usize, clicked: &
 fn render_level_rows(ui: &mut egui::Ui, items: &[&MenuItem], depth: usize, clicked: &mut Option<String>, nav: &mut crate::menu_nav::Nav) {
     let t = crate::theme::Tokens::get(ui.ctx());
     let lang = crate::i18n::current();
+    // Items never wrap: the menu widens to its longest label plus shortcut (translations can be
+    // longer than the English).
+    ui.style_mut().wrap_mode = Some(egui::TextWrapMode::Extend);
     if t.pro {
         // Spectrum/macOS menus: blue highlight row with white text.
         let v = &mut ui.style_mut().visuals;
