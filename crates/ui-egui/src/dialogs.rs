@@ -43,7 +43,7 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
     for d in dialogs {
         let mut fields = d.fields.clone();
         let mut outcome: Option<bool> = None; // Some(true)=OK, Some(false)=Cancel
-        let title = title(&d);
+        let title = display_title(&d);
         let id = egui::Id::new(("dialog", d.id));
         // Offset from centre, moved by dragging the title bar (view state only, so egui memory).
         let offset: egui::Vec2 = ctx.data(|m| m.get_temp(id)).unwrap_or_default();
@@ -89,8 +89,8 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
                     }
                 }
                 DialogKind::About => {
-                    ui.label("PhotoCraft — an open-source, native image editor written in Rust.");
-                    ui.label(format!("Version {}", photocraft_engine::build_info::long_version()));
+                    ui.label(tl!("PhotoCraft — an open-source, native image editor written in Rust."));
+                    ui.label(crate::i18n::fmt(tl!("Version {version}"), &[("version", &photocraft_engine::build_info::long_version())]));
                     ui.add_space(12.0);
                     ui.vertical_centered(|ui| {
                         crate::links::discord_button(app, ui, 220.0);
@@ -122,14 +122,14 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
                 ui.spacing_mut().item_spacing.x = 10.0;
                 if matches!(d.kind, DialogKind::About | DialogKind::Error) {
-                    if crate::widgets::primary_button(ui, "OK", 84.0).clicked() {
+                    if crate::widgets::primary_button(ui, tl!("OK"), 84.0).clicked() {
                         outcome = Some(false);
                     }
                 } else {
                     let ok_label = if d.kind == DialogKind::NewDocument {
-                        "Create"
+                        tl!("Create")
                     } else if d.fields.contains_key("__export") {
-                        "Export"
+                        tl!("Export")
                     } else {
                         crate::file_ui::ok_label(&d.fields).unwrap_or("OK")
                     };
@@ -174,6 +174,20 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
         }
     }
     ctx.data_mut(|m| m.insert_temp(egui::Id::new(RECTS), shown));
+}
+
+/// The dialog title as shown: [`title`] in the UI language.
+fn display_title(d: &Dialog) -> String {
+    match d.kind {
+        DialogKind::Command => {
+            let label = d.fields.get("__label").and_then(Value::as_str).unwrap_or("Command");
+            // Dialog labels are catalogued with their "…" ("Export As…"); some commands omit it.
+            let with_dots = format!("{}…", label.trim_end_matches('…'));
+            let shown = if crate::i18n::has(crate::i18n::current(), label) { tl!(label) } else { tl!(&with_dots) };
+            shown.trim_end_matches('…').to_string()
+        }
+        _ => tl!(&title(d)).to_string(),
+    }
 }
 
 pub fn title(d: &Dialog) -> String {

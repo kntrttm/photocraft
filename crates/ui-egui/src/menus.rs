@@ -708,6 +708,7 @@ pub fn menu_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) -> f32 {
     let items: std::cell::OnceCell<Vec<MenuItem>> = std::cell::OnceCell::new();
     let app_ref: &PhotocraftApp = app;
     let mut right = ui.cursor().left();
+    let lang = crate::i18n::current();
     let mut clicked: Option<String> = None;
     let t = crate::theme::Tokens::get(ui.ctx());
     let mut nav = crate::menu_nav::Nav::load(ui.ctx());
@@ -723,12 +724,12 @@ pub fn menu_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) -> f32 {
             nav.bar_bottom = Some(ui.max_rect().bottom());
             let mut buttons = Vec::with_capacity(TOP_MENUS.len());
             for top in TOP_MENUS {
-                let r = ui.menu_button(egui::RichText::new(top).color(t.text_dim), |ui| {
+                let r = ui.menu_button(egui::RichText::new(crate::i18n::tr(lang, top)).color(t.text_dim), |ui| {
                     let items = items.get_or_init(|| menu_items(app_ref));
                     let mine: Vec<&MenuItem> = items.iter().filter(|i| i.path.first().map(String::as_str) == Some(top)).collect();
                     ui.set_min_width(220.0);
                     if mine.is_empty() {
-                        ui.weak("(coming soon)");
+                        ui.weak(crate::i18n::tr(lang, "(coming soon)"));
                     }
                     render_level(ui, &mine, 1, &mut clicked, &mut nav);
                 });
@@ -783,6 +784,7 @@ fn render_level(ui: &mut egui::Ui, items: &[&MenuItem], depth: usize, clicked: &
 
 fn render_level_rows(ui: &mut egui::Ui, items: &[&MenuItem], depth: usize, clicked: &mut Option<String>, nav: &mut crate::menu_nav::Nav) {
     let t = crate::theme::Tokens::get(ui.ctx());
+    let lang = crate::i18n::current();
     if t.pro {
         // Spectrum/macOS menus: blue highlight row with white text.
         let v = &mut ui.style_mut().visuals;
@@ -805,7 +807,7 @@ fn render_level_rows(ui: &mut egui::Ui, items: &[&MenuItem], depth: usize, click
                 }
                 continue;
             }
-            let mut text = it.label.clone();
+            let mut text = crate::i18n::tr_id(lang, &it.id, &it.label).to_string();
             if let Some(c) = it.checked {
                 text = format!("{} {}", if c { "✔" } else { "  " }, text);
             }
@@ -836,7 +838,9 @@ fn render_level_rows(ui: &mut egui::Ui, items: &[&MenuItem], depth: usize, click
             let any_enabled = child.iter().any(|c| c.enabled && c.label != "---");
             let enabled = any_enabled || !child.is_empty();
             ui.add_enabled_ui(enabled, |ui| {
-                nav.row(ui, depth - 1, enabled, None, |ui, nav| (ui.menu_button(name, |ui| render_level(ui, &child, depth + 1, clicked, nav)).response, ()));
+                nav.row(ui, depth - 1, enabled, None, |ui, nav| {
+                    (ui.menu_button(crate::i18n::tr(lang, name), |ui| render_level(ui, &child, depth + 1, clicked, nav)).response, ())
+                });
             });
             last_was_sep = false;
         }

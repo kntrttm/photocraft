@@ -222,7 +222,7 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
         ui.add_space(14.0);
         ui.vertical(|ui| {
             // new / current swatches.
-            ui.label(egui::RichText::new("new").size(11.0).color(t.text_dim));
+            ui.label(egui::RichText::new(tl!("new")).size(11.0).color(t.text_dim));
             let (sw, _) = ui.allocate_exact_size(vec2(64.0, 72.0), Sense::hover());
             let orig = f.get("__orig").and_then(Value::as_str).and_then(parse_hex).unwrap_or(rgb);
             ui.painter().rect_filled(Rect::from_min_size(sw.min, vec2(64.0, 36.0)), 0.0, c32(rgb));
@@ -230,13 +230,13 @@ pub fn body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
             ui.painter().rect_filled(cur, 0.0, c32(orig));
             ui.painter().rect_stroke(sw, 0.0, Stroke::new(1.0, t.field_border), StrokeKind::Outside);
             let click_cur = ui.interact(cur, ui.id().with("cp-current"), Sense::click());
-            if click_cur.on_hover_text("Click to restore the current colour").clicked() {
+            if click_cur.on_hover_text(tl!("Click to restore the current colour")).clicked() {
                 set_rgb(f, orig, None);
             }
-            ui.label(egui::RichText::new("current").size(11.0).color(t.text_dim));
+            ui.label(egui::RichText::new(tl!("current")).size(11.0).color(t.text_dim));
             ui.add_space(10.0);
             let mut web = f.get("__webOnly").and_then(Value::as_bool).unwrap_or(false);
-            if widgets::checkbox(ui, &mut web, "Only Web Colors").changed() {
+            if widgets::checkbox(ui, &mut web, tl!("Only Web Colors")).changed() {
                 f.insert("__webOnly".into(), json!(web));
                 set_rgb(f, rgb, None);
             }
@@ -268,7 +268,7 @@ fn fields(ui: &mut egui::Ui, f: &mut Map<String, Value>, mode: &str, rgb: [f32; 
             if resp.clicked() {
                 new_mode = Some(key);
             }
-            ui.label(egui::RichText::new(label).color(t.text_dim));
+            ui.label(egui::RichText::new(tl!(&label)).color(t.text_dim));
             let mut v = vals[i].round();
             if widgets::value_field(ui, &mut v, ranges[i].clone(), "", 54.0).changed() {
                 let (mut h, mut c) = (hsv, rgb);
@@ -286,7 +286,7 @@ fn fields(ui: &mut egui::Ui, f: &mut Map<String, Value>, mode: &str, rgb: [f32; 
         }
         for (i, (label, v, range)) in [("L:", lab[0], 0.0..=100.0), ("a:", lab[1], -128.0..=127.0), ("b:", lab[2], -128.0..=127.0)].into_iter().enumerate() {
             ui.label("");
-            ui.label(egui::RichText::new(label).color(t.text_dim));
+            ui.label(egui::RichText::new(tl!(&label)).color(t.text_dim));
             let mut x = v.round();
             if widgets::value_field(ui, &mut x, range, "", 54.0).changed() {
                 let mut l = lab;
@@ -298,7 +298,7 @@ fn fields(ui: &mut egui::Ui, f: &mut Map<String, Value>, mode: &str, rgb: [f32; 
         }
         for (i, label) in ["C:", "M:", "Y:", "K:"].into_iter().enumerate() {
             ui.label("");
-            ui.label(egui::RichText::new(label).color(t.text_dim));
+            ui.label(egui::RichText::new(tl!(&label)).color(t.text_dim));
             let mut x = (cmyk[i] * 100.0).round();
             if widgets::value_field(ui, &mut x, 0.0..=100.0, "", 54.0).changed() {
                 let mut k = cmyk;

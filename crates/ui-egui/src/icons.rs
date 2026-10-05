@@ -107,7 +107,7 @@ pub fn button(ui: &mut egui::Ui, name: &str, box_size: f32, selected: bool, tool
         t.icon
     };
     paint(ui, rect, name, (box_size * 0.52).round(), tint);
-    if tooltip.is_empty() { resp } else { resp.on_hover_text(tooltip) }
+    if tooltip.is_empty() { resp } else { resp.on_hover_text(tl!(tooltip)) }
 }
 
 /// Rail toggle: "on" gets a quiet filled background and full-strength icon (no accent).
@@ -122,7 +122,7 @@ pub fn rail_button(ui: &mut egui::Ui, name: &str, box_size: f32, on: bool, toolt
     }
     let tint = if on || resp.hovered() { t.text } else { t.text_faint };
     paint(ui, rect, name, (box_size * 0.52).round(), tint);
-    resp.on_hover_text(tooltip)
+    resp.on_hover_text(tl!(tooltip))
 }
 
 #[cfg(test)]
