@@ -146,8 +146,53 @@ fn missing_char(ctx: &egui::Context, shapes: &[egui::epaint::ClippedShape]) -> O
     ctx.fonts_mut(|f| chars.into_iter().find(|c| !f.has_glyph(&font, *c)))
 }
 
+/// (ascent, descent, line gap) of a face in em, from its `hhea` table; `descent` is negative.
+fn vertical_metrics(font: &[u8], index: u32) -> Option<(f32, f32, f32)> {
+    let u16_at = |o: usize| font.get(o..o.checked_add(2)?).map(|b| u16::from_be_bytes([b[0], b[1]]));
+    let u32_at = |o: usize| font.get(o..o.checked_add(4)?).map(|b| u32::from_be_bytes([b[0], b[1], b[2], b[3]]));
+    let i16_at = |o: usize| u16_at(o).map(|v| v as i16 as f32);
+    let dir = if font.get(..4)? == b"ttcf" {
+        // Collection: the offset table of face `index` follows a 12-byte header.
+        u32_at(12usize.checked_add((index as usize).checked_mul(4)?)?)? as usize
+    } else {
+        0
+    };
+    let tables = u16_at(dir.checked_add(4)?)? as usize;
+    let (mut hhea, mut head) = (None, None);
+    for i in 0..tables {
+        let rec = dir.checked_add(12)?.checked_add(i.checked_mul(16)?)?;
+        let tag = font.get(rec..rec.checked_add(4)?)?;
+        let off = u32_at(rec.checked_add(8)?)? as usize;
+        match tag {
+            b"hhea" => hhea = Some(off),
+            b"head" => head = Some(off),
+            _ => {}
+        }
+    }
+    let (hhea, head) = (hhea?, head?);
+    let upm = u16_at(head.checked_add(18)?)? as f32;
+    if upm <= 0.0 {
+        return None;
+    }
+    Some((i16_at(hhea.checked_add(4)?)? / upm, i16_at(hhea.checked_add(6)?)? / upm, i16_at(hhea.checked_add(8)?)? / upm))
+}
+
+/// `y_offset_factor` that puts `face`'s baseline where `primary`'s would be. egui centres a
+/// fallback face's row in the primary font's row, so a face with a big line gap (Hiragino: 0.5em)
+/// otherwise rides about 0.23em high next to Latin text.
+fn baseline_offset(face: (f32, f32, f32), primary: (f32, f32, f32)) -> f32 {
+    let height = |m: (f32, f32, f32)| m.0 - m.1 + m.2;
+    let off = primary.0 - face.0 - 0.5 * (height(primary) - height(face));
+    if off.is_finite() { off.clamp(-0.5, 0.5) } else { 0.0 }
+}
+
 /// Registers `name` at the lowest priority in every font family.
-fn add_to_all_families(ctx: &egui::Context, name: String, data: FontData) {
+fn add_to_all_families(ctx: &egui::Context, name: String, mut data: FontData) {
+    // Align to Inter, the primary of every UI family; JetBrains Mono differs by under 0.005em.
+    let primary = ctx.fonts(|f| f.definitions().font_data.get("Inter").and_then(|p| vertical_metrics(&p.font, p.index)));
+    if let (Some(face), Some(primary)) = (vertical_metrics(&data.font, data.index), primary) {
+        data.tweak.y_offset_factor = baseline_offset(face, primary);
+    }
     let mut families: Vec<FontFamily> = ctx.fonts(|f| f.definitions().families.keys().cloned().collect());
     for f in [FontFamily::Proportional, FontFamily::Monospace] {
         if !families.contains(&f) {
@@ -270,6 +315,27 @@ mod tests {
             out.textures_delta.clear();
         }
         ctx.fonts_mut(|f| f.has_glyphs(&FontId::proportional(12.0), &text.replace(' ', "")))
+    }
+
+    #[test]
+    fn vertical_metrics_parse_and_reject_garbage() {
+        let (asc, desc, gap) = vertical_metrics(include_bytes!("../../../assets/fonts/Inter-Regular.ttf"), 0).unwrap();
+        assert!((asc - 1984.0 / 2048.0).abs() < 1e-4 && (desc + 494.0 / 2048.0).abs() < 1e-4 && gap == 0.0);
+        for bad in [&b""[..], b"ttcf", b"ttcf\0\0\0\0\0\0\0\0\xff\xff\xff\xff", b"\0\x01\0\0\0\xff\0\0\0\0\0\0"] {
+            assert!(vertical_metrics(bad, 0).is_none());
+            assert!(vertical_metrics(bad, u32::MAX).is_none());
+        }
+    }
+
+    #[test]
+    fn a_face_with_a_big_line_gap_is_shifted_down_onto_the_primary_baseline() {
+        let inter = (1984.0 / 2048.0, -494.0 / 2048.0, 0.0);
+        let hiragino = (0.88, -0.12, 0.5);
+        assert!((baseline_offset(hiragino, inter) - 0.2338).abs() < 1e-3);
+        assert_eq!(baseline_offset(inter, inter), 0.0);
+        assert_eq!(baseline_offset((f32::NAN, 0.0, 0.0), inter), 0.0);
+        let jb = (1.02, -0.3, 0.0);
+        assert!((baseline_offset(hiragino, jb) - baseline_offset(hiragino, inter)).abs() < 0.005, "one offset serves the monospace family too");
     }
 
     #[test]
