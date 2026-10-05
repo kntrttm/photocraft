@@ -476,6 +476,10 @@ pub struct TextEdit {
     pub created: bool,
     #[serde(skip)]
     pub dragging: bool,
+    /// IME composition in progress: (start, length) in characters. The preedit text lives in the
+    /// layer so it lays out like typed text; each IME update replaces it.
+    #[serde(skip)]
+    pub preedit: Option<(usize, usize)>,
 }
 
 /// View-menu overlays.

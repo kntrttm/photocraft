@@ -100,7 +100,7 @@ pub fn pointer_down(app: &mut PhotocraftApp, x: f64, y: f64, shift: bool) -> boo
     if let Some(id) = hit_layer(app, x, y) {
         let _ = app.session.select_layer(id);
         let off = hit_offset(app, id, x, y);
-        app.ui.text_edit = Some(TextEdit { layer: id.0, caret: off, anchor: off, session: session_key(app), created: false, dragging: true });
+        app.ui.text_edit = Some(TextEdit { layer: id.0, caret: off, anchor: off, session: session_key(app), created: false, dragging: true, preedit: None });
         return true;
     }
     false
@@ -149,7 +149,7 @@ pub fn pointer_up(app: &mut PhotocraftApp, start: [f64; 2], end: [f64; 2]) {
         }
         // Like Photoshop: the placeholder is selected, so typing replaces it.
         let n = PLACEHOLDER.chars().count();
-        app.ui.text_edit = Some(TextEdit { layer: id, caret: n, anchor: 0, session: key, created: true, dragging: false });
+        app.ui.text_edit = Some(TextEdit { layer: id, caret: n, anchor: 0, session: key, created: true, dragging: false, preedit: None });
     }
 }
 
@@ -174,6 +174,33 @@ fn insert(app: &mut PhotocraftApp, s: &str) {
     {
         e.caret = a + s.chars().count();
         e.anchor = e.caret;
+    }
+}
+
+/// IME composition. The preedit text is written into the layer (so it lays out and reflows like
+/// typed text) and replaced by every update; `commit` makes the result final.
+fn ime_update(app: &mut PhotocraftApp, s: &str, commit: bool) {
+    let Some(ed) = app.ui.text_edit.clone() else { return };
+    let Some(text) = current_text(app, LayerId(ed.layer)) else { return };
+    let n = text.chars().count();
+    let s = s.replace("\r\n", "\n").replace('\r', "\n");
+    let (start, end) = match ed.preedit {
+        Some((p, l)) if p.saturating_add(l) <= n => (p, p + l),
+        _ => (ed.caret.min(ed.anchor).min(n), ed.caret.max(ed.anchor).min(n)),
+    };
+    if start == end && s.is_empty() {
+        if let Some(e) = app.ui.text_edit.as_mut() {
+            e.preedit = None;
+        }
+        return;
+    }
+    let len = s.chars().count();
+    if app.run("type.edit", json!({"layer": ed.layer, "replace": {"start": start, "end": end, "text": s}, "coalesce": ed.session})).is_ok()
+        && let Some(e) = app.ui.text_edit.as_mut()
+    {
+        e.caret = start + len;
+        e.anchor = e.caret;
+        e.preedit = if commit || len == 0 { None } else { Some((start, len)) };
     }
 }
 
@@ -274,6 +301,11 @@ pub fn handle_keys(app: &mut PhotocraftApp, ctx: &egui::Context) -> bool {
         handled[k] = true;
         match ev {
             egui::Event::Text(s) | egui::Event::Paste(s) => insert(app, s),
+            // A bare line break from the IME is the Enter key, which the key arm handles.
+            egui::Event::Ime(egui::ImeEvent::Preedit { text: s, .. } | egui::ImeEvent::Commit(s)) if s == "\n" || s == "\r" => handled[k] = false,
+            egui::Event::Ime(egui::ImeEvent::Preedit { text, .. }) => ime_update(app, text, false),
+            egui::Event::Ime(egui::ImeEvent::Commit(s)) => ime_update(app, s, true),
+            egui::Event::Ime(_) => {}
             egui::Event::Copy | egui::Event::Cut => {
                 if a < b {
                     ctx.copy_text(text.chars().skip(a).take(b - a).collect());
@@ -385,6 +417,15 @@ pub fn draw_overlay(app: &mut PhotocraftApp, painter: &egui::Painter, xf: &ViewX
         let p = aff.apply(Point::new(x as f64, y as f64));
         xf.to_screen(p.x as f32, p.y as f32)
     };
+    // Tell the OS where the caret is: this is what enables the IME and places its candidate window.
+    {
+        let (x, top, bot) = l.caret(byte_of(&text, ed.caret));
+        let (x, top, bot) = if l.lines.is_empty() { (0.0, -(12.0 * l.px_per_pt.max(1.0)), 3.0) } else { (x, top, bot) };
+        let r = egui::Rect::from_two_pos(scr(x, top), scr(x, bot)).expand2(egui::vec2(1.0, 0.0));
+        painter.ctx().output_mut(|o| {
+            o.ime = Some(egui::output::IMEOutput { purpose: egui::IMEPurpose::Normal, rect: r, cursor_rect: r, should_interrupt_composition: false });
+        });
+    }
     // Frame: paragraph text shows its box with handles; point text an underline per line.
     let shape = app.session.active().and_then(|s| text_layer(&s.doc, id).map(|t| t.shape));
     let frame = Stroke::new(1.0, t.accent);
@@ -403,6 +444,19 @@ pub fn draw_overlay(app: &mut PhotocraftApp, painter: &egui::Painter, xf: &ViewX
             for ln in &l.lines {
                 let y = ln.baseline + ln.descent * 0.25;
                 painter.line_segment([scr(ln.x0.min(0.0), y), scr(ln.x1.max(ln.x0 + 1.0), y)], Stroke::new(1.0, t.accent.gamma_multiply(0.8)));
+            }
+        }
+    }
+    // Uncommitted IME text is underlined.
+    if let Some((ps, pl)) = ed.preedit {
+        let (a, b) = (byte_of(&text, ps), byte_of(&text, ps + pl));
+        for (li, ln) in l.lines.iter().enumerate() {
+            let xs: Vec<(f32, f32)> =
+                l.clusters.iter().filter(|c| c.line == li && c.range.start >= a && c.range.end <= b).map(|c| (c.x, c.x + c.advance)).collect();
+            let (x0, x1) = xs.iter().fold((f32::MAX, f32::MIN), |(lo, hi), (p, q)| (lo.min(*p), hi.max(*q)));
+            if x0 < x1 {
+                let y = ln.baseline + ln.descent * 0.5;
+                painter.line_segment([scr(x0, y), scr(x1, y)], Stroke::new(1.5, t.accent));
             }
         }
     }
@@ -943,6 +997,33 @@ mod tests {
         let doc = &app.session.active().unwrap().doc;
         assert_eq!(doc.layers.last().unwrap().name, "Héllo world");
         assert!(app.ui.text_edit.is_none());
+    }
+
+    #[test]
+    fn ime_preedit_is_replaced_by_each_update_and_commit_finalises() {
+        let mut app = app();
+        pointer_up(&mut app, [50.0, 100.0], [50.0, 100.0]);
+        // Each preedit update replaces the previous one (and the placeholder selection first).
+        ime_update(&mut app, "に", false);
+        assert_eq!(layer_text(&app), "に");
+        ime_update(&mut app, "にほん", false);
+        ime_update(&mut app, "にほんご", false);
+        assert_eq!(layer_text(&app), "にほんご");
+        assert_eq!(app.ui.text_edit.as_ref().unwrap().preedit, Some((0, 4)));
+        ime_update(&mut app, "日本語", true);
+        assert_eq!(layer_text(&app), "日本語");
+        let ed = app.ui.text_edit.clone().unwrap();
+        assert_eq!((ed.caret, ed.anchor, ed.preedit), (3, 3, None));
+        // The next composition starts after the committed text; cancelling removes it again.
+        ime_update(&mut app, "あ", false);
+        assert_eq!(layer_text(&app), "日本語あ");
+        ime_update(&mut app, "", false);
+        assert_eq!(layer_text(&app), "日本語");
+        assert_eq!(app.ui.text_edit.as_ref().unwrap().preedit, None);
+        // A stale preedit range (text shortened by undo) must not panic.
+        app.ui.text_edit.as_mut().unwrap().preedit = Some((10, 5));
+        ime_update(&mut app, "x", true);
+        assert_eq!(layer_text(&app), "日本語x");
     }
 
     #[test]

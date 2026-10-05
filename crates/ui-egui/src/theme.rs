@@ -290,7 +290,63 @@ pub fn install_fonts(ctx: &egui::Context) {
         stack.extend(fallback.iter().cloned());
         fonts.families.insert(FontFamily::Name(fam.into()), stack);
     }
+    #[cfg(not(target_arch = "wasm32"))]
+    add_cjk_fallback(&mut fonts, &cjk_font_candidates());
     ctx.set_fonts(fonts);
+}
+
+/// Name under which the OS Japanese/CJK font is registered.
+const CJK_FONT: &str = "system-cjk";
+/// Skip absurdly large files (a corrupt or non-font path must not eat memory).
+const CJK_MAX_BYTES: u64 = 128 << 20;
+
+/// OS-installed fonts with Japanese coverage, most preferred first: (path, face index in a collection).
+#[cfg(not(target_arch = "wasm32"))]
+fn cjk_font_candidates() -> Vec<(std::path::PathBuf, u32)> {
+    use std::path::PathBuf;
+    let list: &[(&str, u32)] = if cfg!(target_os = "macos") {
+        &[
+            ("/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc", 0),
+            ("/System/Library/Fonts/ヒラギノ角ゴシック W4.ttc", 0),
+            ("/Library/Fonts/Arial Unicode.ttf", 0),
+            ("/System/Library/Fonts/Hiragino Sans GB.ttc", 0),
+        ]
+    } else if cfg!(target_os = "windows") {
+        &[("C:\\Windows\\Fonts\\YuGothM.ttc", 0), ("C:\\Windows\\Fonts\\YuGothR.ttc", 0), ("C:\\Windows\\Fonts\\meiryo.ttc", 0), ("C:\\Windows\\Fonts\\msgothic.ttc", 0)]
+    } else {
+        &[
+            ("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc", 0),
+            ("/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc", 0),
+            ("/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc", 0),
+            ("/usr/share/fonts/google-noto-cjk/NotoSansCJK-Regular.ttc", 0),
+            ("/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf", 0),
+            ("/usr/share/fonts/truetype/fonts-japanese-gothic.ttf", 0),
+            ("/usr/share/fonts/truetype/takao-gothic/TakaoPGothic.ttf", 0),
+        ]
+    };
+    list.iter().map(|(p, i)| (PathBuf::from(p), *i)).collect()
+}
+
+/// Appends the first readable font from `candidates` to the end of every family's stack, so
+/// Latin text keeps using Inter / JetBrains Mono and only missing glyphs (Japanese) fall through.
+/// Without it egui draws CJK as tofu. Returns whether a font was added; none found is not an error.
+#[cfg(not(target_arch = "wasm32"))]
+fn add_cjk_fallback(fonts: &mut FontDefinitions, candidates: &[(std::path::PathBuf, u32)]) -> bool {
+    for (path, index) in candidates {
+        let Ok(meta) = std::fs::metadata(path) else { continue };
+        if !meta.is_file() || meta.len() == 0 || meta.len() > CJK_MAX_BYTES {
+            continue;
+        }
+        let Ok(bytes) = std::fs::read(path) else { continue };
+        let mut data = FontData::from_owned(bytes);
+        data.index = *index;
+        fonts.font_data.insert(CJK_FONT.to_owned(), Arc::new(data));
+        for stack in fonts.families.values_mut() {
+            stack.push(CJK_FONT.to_owned());
+        }
+        return true;
+    }
+    false
 }
 
 pub fn medium(size: f32) -> FontId {
@@ -533,5 +589,34 @@ pub mod live {
             assert_eq!(t.radius, 9.0);
             assert_eq!(unknown, vec!["nope".to_string()]);
         }
+    }
+}
+
+#[cfg(all(test, not(target_arch = "wasm32")))]
+mod cjk_tests {
+    use super::*;
+
+    #[test]
+    fn fallback_is_appended_to_every_family_and_missing_files_are_skipped() {
+        let dir = std::env::temp_dir().join(format!("photocraft-cjk-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let font = dir.join("f.ttf");
+        std::fs::write(&font, include_bytes!("../../../assets/fonts/Inter-Regular.ttf")).unwrap();
+        let empty = dir.join("empty.ttf");
+        std::fs::write(&empty, b"").unwrap();
+
+        let mut fonts = FontDefinitions::default();
+        let before: Vec<usize> = fonts.families.values().map(Vec::len).collect();
+        assert!(add_cjk_fallback(&mut fonts, &[(dir.join("missing.ttc"), 0), (empty, 0), (dir.join("nope"), 0), (font, 0)]));
+        assert!(fonts.font_data.contains_key(CJK_FONT));
+        for (stack, n) in fonts.families.values().zip(before) {
+            assert_eq!(stack.len(), n + 1);
+            assert_eq!(stack.last().map(String::as_str), Some(CJK_FONT), "must be last so Latin keeps its own font");
+        }
+        // Nothing usable: untouched.
+        let mut fonts = FontDefinitions::default();
+        assert!(!add_cjk_fallback(&mut fonts, &[(dir.join("missing.ttc"), 0)]));
+        assert!(!fonts.font_data.contains_key(CJK_FONT));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
