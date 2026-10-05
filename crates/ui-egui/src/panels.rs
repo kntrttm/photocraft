@@ -308,10 +308,12 @@ pub fn title_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
                         ui.spacing_mut().item_spacing.x = 6.0;
                         let mut ws = app.ui.workspace.clone();
                         let opts = [
-                            (tl!("Essentials").to_string(), tl!("Essentials")),
-                            (tl!("Photography").to_string(), tl!("Photography")),
-                            (tl!("Painting").to_string(), tl!("Painting")),
-                            (tl!("Graphic and Web").to_string(), tl!("Graphic and Web")),
+                            // Keys stay English (`apply_workspace` matches them); the dropdown
+                            // shows the labels in the UI language.
+                            ("Essentials".to_string(), tl!("Essentials")),
+                            ("Photography".to_string(), tl!("Photography")),
+                            ("Painting".to_string(), tl!("Painting")),
+                            ("Graphic and Web".to_string(), tl!("Graphic and Web")),
                         ];
                         if widgets::dropdown(ui, "workspace", &mut ws, &opts, 130.0) {
                             app.ui.workspace = ws;
