@@ -13,3 +13,9 @@ serde_json = { workspace = true }
 serde = { workspace = true }
 # perf/budgets.toml and scorecard/*.toml (MIT OR Apache-2.0).
 toml = "1"
+# fonts-index: named instances / axes / PostScript names (same version as photocraft-text).
+skrifa = "0.44"
+
+[dev-dependencies]
+# fonts-index round-trip test against the real catalog parser.
+photocraft-text = { workspace = true }

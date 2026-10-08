@@ -35,7 +35,7 @@ apps/
   photocraft                 desktop app (eframe/wgpu), TCP control server
   photocraft-cli             headless CLI (convert/info/run/batch/commands/mcp)
   photocraft-web             the same app in the browser (trunk + wasm-bindgen)
-xtask/                       cargo xtask layers | wasm | ci | stats | corpus | test-corpus | parity | perf | scorecard
+xtask/                       cargo xtask layers | wasm | ci | stats | corpus | test-corpus | fonts-index | parity | perf | scorecard
 ```
 
 **Layering is enforced** by `cargo xtask layers`. A crate may depend only on lower layers. `psd`, `codecs` and `cms` depend on nothing in the workspace. Nothing below `ui-egui` may use egui, eframe, winit or rfd. A new crate must be registered in `xtask/src/layers.rs`.
