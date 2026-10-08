@@ -661,6 +661,10 @@ pub struct TypePrefs {
     pub font_preview: FontPreview,
     pub fill_new_type_layers_with_placeholder: bool,
     pub recent_fonts: u32,
+    /// Allow downloading fonts from Google Fonts (`type.fonts.catalog`, `type.fonts.install`,
+    /// Resolve Missing Fonts' download). Off until the user (never an automation client) turns
+    /// it on; every networked font command checks it.
+    pub allow_online_fonts: bool,
 }
 
 impl Default for TypePrefs {
@@ -674,6 +678,7 @@ impl Default for TypePrefs {
             font_preview: FontPreview::Medium,
             fill_new_type_layers_with_placeholder: true,
             recent_fonts: 10,
+            allow_online_fonts: false,
         }
     }
 }

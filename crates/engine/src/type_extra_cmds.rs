@@ -436,7 +436,7 @@ pub fn missing_fonts(doc: &Document) -> Vec<String> {
 }
 
 /// Replace missing families per `map` (missing → installed; unmapped ones → the default family).
-fn replace_fonts(s: &mut Session, map: &serde_json::Map<String, Value>, all: bool) -> Result<Value> {
+pub(crate) fn replace_fonts(s: &mut Session, map: &serde_json::Map<String, Value>, all: bool) -> Result<Value> {
     let d = s.active().ok_or(EngineError::NoDocument)?;
     let missing = missing_fonts(&d.doc);
     let pick = |f: &str| -> Option<String> {
@@ -481,7 +481,19 @@ fn replace_fonts(s: &mut Session, map: &serde_json::Map<String, Value>, all: boo
 fn resolve_missing(s: &mut Session, p: &Value) -> Result<Value> {
     match p.get("map").and_then(Value::as_object) {
         Some(m) => replace_fonts(s, &m.clone(), false),
-        None => Ok(json!({"missing": missing_fonts(&s.active().ok_or(EngineError::NoDocument)?.doc)})),
+        None => {
+            let missing = missing_fonts(&s.active().ok_or(EngineError::NoDocument)?.doc);
+            match p.get("download") {
+                None | Some(Value::Null) | Some(Value::Bool(false)) => {}
+                Some(Value::Bool(true)) => return crate::font_download_cmds::download_missing(s, missing),
+                Some(_) => return Err(EngineError::BadParams { cmd: "type.resolveMissingFonts".into(), msg: "`download` must be true or false".into() }),
+            }
+            let mut out = json!({"missing": missing});
+            if let Some(d) = crate::font_download_cmds::downloadable(s, &missing) {
+                out["downloadable"] = d;
+            }
+            Ok(out)
+        }
     }
 }
 
@@ -558,7 +570,7 @@ pub fn specs() -> Vec<CommandSpec> {
             "type.resolveMissingFonts",
             "Resolve Missing Fonts…",
             &["Type"],
-            r##"{"map":{"Missing Family":"Installed Family"}?} (no map: list the missing families)"##,
+            r##"{"map":{"Missing Family":"Installed Family"}?,"download":bool=false?} (no map: list the missing families, with "downloadable":[{"missing","family"}] for those Google Fonts has once the index is loaded and Preferences > Type > Allow Online Fonts is on; download=true installs them as a background job and remaps names that differ; see type.fonts.install)"##,
             any_text,
             resolve_missing
         ),

@@ -35,6 +35,7 @@ pub mod extra_cmds;
 pub mod file_cmds;
 pub mod fill_cmds;
 pub mod fill_key_cmds;
+pub mod font_download_cmds;
 pub mod filters;
 pub mod filters_ext;
 pub mod float_cmds;
@@ -323,6 +324,9 @@ pub struct Session {
     pub authorize: Option<fn(&str, &serde_json::Value) -> Result<()>>,
     /// Background jobs (see [`jobs`]).
     jobs: jobs::Jobs,
+    /// Google Fonts download services (fetcher, store, index), injected by the shell; `None`
+    /// where online fonts are unavailable (see `font_download_cmds`).
+    font_services: Option<Arc<font_download_cmds::FontServices>>,
 }
 
 /// Move item `i` of `v` to position `to`, clamped to the end. Returns where it went; `None` when
