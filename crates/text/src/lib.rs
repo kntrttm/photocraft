@@ -27,6 +27,7 @@ pub mod psd;
 pub mod psd_styles;
 pub mod raster;
 pub mod render;
+pub mod sha256;
 pub mod spell;
 pub mod warp;
 

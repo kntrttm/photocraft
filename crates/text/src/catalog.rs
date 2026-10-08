@@ -102,6 +102,9 @@ impl FontFile {
     }
 }
 
+/// The longest storage slug accepted.
+const MAX_SLUG: usize = 64;
+
 /// A font family with its files.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Family {
@@ -115,6 +118,38 @@ pub struct Family {
     #[serde(default)]
     pub license_path: Option<String>,
     pub files: Vec<FontFile>,
+}
+
+impl Family {
+    /// The directory name of the family in google/fonts (`ofl/notosansjp/X.ttf` gives
+    /// `notosansjp`), used to name the family's storage folder instead of the (free-form) family
+    /// name. `None` when the family has no files, its files disagree about the directory, or the
+    /// name is not `[a-z0-9_-]+` (1..=64 characters).
+    pub fn slug(&self) -> Option<String> {
+        self.slug_checked().ok().flatten()
+    }
+
+    fn slug_checked(&self) -> Result<Option<String>, CatalogError> {
+        let mut slug: Option<&str> = None;
+        for f in &self.files {
+            let mut parts = f.path.split('/');
+            let (_license_dir, dir) = (parts.next(), parts.next());
+            // At least `<dir>/<slug>/<file>`.
+            let (Some(dir), true) = (dir, parts.next().is_some()) else {
+                return invalid(format!("`{}` is not under a `<license>/<family>/` directory", f.path));
+            };
+            let ok = !dir.is_empty() && dir.len() <= MAX_SLUG && dir.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_' || b == b'-');
+            if !ok {
+                return invalid(format!("`{}` has a directory name that is not [a-z0-9_-]+", f.path));
+            }
+            match slug {
+                None => slug = Some(dir),
+                Some(s) if s == dir => {}
+                Some(_) => return invalid(format!("the files of `{}` are in different directories", self.family)),
+            }
+        }
+        Ok(slug.map(str::to_string))
+    }
 }
 
 #[derive(Deserialize)]
@@ -213,6 +248,50 @@ fn check_file(f: &FontFile) -> Result<(), CatalogError> {
     Ok(())
 }
 
+/// `(weight, italic)` for a style token such as `700italic`, `bold`, `regular`, `lightitalic`.
+fn parse_style_token(q: &str) -> Option<(u32, bool)> {
+    let (base, italic) = match q.strip_suffix("italic").or_else(|| q.strip_suffix("oblique")) {
+        Some(b) => (b, true),
+        None => (q, false),
+    };
+    let weight = match base {
+        "" | "regular" | "normal" | "book" => 400,
+        "thin" | "hairline" => 100,
+        "extralight" | "ultralight" => 200,
+        "light" => 300,
+        "medium" => 500,
+        "semibold" | "demibold" => 600,
+        "bold" => 700,
+        "extrabold" | "ultrabold" | "heavy" => 800,
+        "black" => 900,
+        n => n.parse::<u32>().ok().filter(|w| (1..=1000).contains(w))?,
+    };
+    Some((weight, italic))
+}
+
+fn file_matches_style(f: &FontFile, q: &str) -> bool {
+    if f.postscript.iter().any(|p| normalize(p) == q) {
+        return true;
+    }
+    let base = f.path.rsplit('/').next().unwrap_or(&f.path);
+    if normalize(base) == q {
+        return true;
+    }
+    let Some((weight, italic)) = parse_style_token(q) else { return false };
+    if f.style.eq_ignore_ascii_case("italic") != italic {
+        return false;
+    }
+    if f.weight == weight {
+        return true;
+    }
+    f.axes.iter().any(|a| a.tag == "wght" && a.min <= weight as f32 && weight as f32 <= a.max)
+}
+
+fn describe_file(f: &FontFile) -> String {
+    let italic = if f.style.eq_ignore_ascii_case("italic") { " italic" } else { "" };
+    if f.is_variable() { format!("{}{italic} (variable)", f.weight) } else { format!("{}{italic}", f.weight) }
+}
+
 /// Percent-encodes everything but unreserved characters and `/`.
 fn encode_path(p: &str) -> String {
     let mut out = String::with_capacity(p.len() + 8);
@@ -246,10 +325,14 @@ impl Catalog {
             return Err(CatalogError::TooMany("families"));
         }
         let mut total = 0usize;
+        let mut seen_names = std::collections::HashSet::new();
         for fam in &raw.families {
             check_str("family name", &fam.family)?;
             if fam.family.trim().is_empty() {
                 return invalid("empty family name");
+            }
+            if !seen_names.insert(fam.family.to_lowercase()) {
+                return invalid(format!("family `{}` is listed twice", fam.family));
             }
             check_str("license", &fam.license)?;
             if fam.categories.len() > MAX_LIST || fam.subsets.len() > MAX_LIST || fam.files.len() > MAX_LIST {
@@ -268,6 +351,9 @@ impl Catalog {
             for f in &fam.files {
                 check_file(f)?;
             }
+            // Every file of a family lives in one google/fonts directory: that directory name is
+            // the family's storage slug.
+            fam.slug_checked()?;
         }
         let mut families = raw.families;
         families.sort_by(|a, b| a.family.to_lowercase().cmp(&b.family.to_lowercase()).then_with(|| a.family.cmp(&b.family)));
@@ -326,6 +412,32 @@ impl Catalog {
             v.push(format!("{fb}{rel}"));
         }
         v
+    }
+
+    /// The files of `family` selected by `styles` (all files when `styles` is empty). A style is
+    /// case-insensitive and may be: a CSS weight (`400`, `700italic`), a weight name with an
+    /// optional `italic` (`regular`, `bold`, `light italic`, `bolditalic`), a PostScript name from
+    /// the index (`Roboto-Bold`) or a file name. A variable file matches the weights its `wght`
+    /// axis covers. Any style that matches nothing is an error naming the styles available.
+    pub fn files_for<'a>(&self, family: &'a Family, styles: &[String]) -> Result<Vec<&'a FontFile>, CatalogError> {
+        if styles.is_empty() {
+            return Ok(family.files.iter().collect());
+        }
+        let mut out: Vec<&FontFile> = Vec::new();
+        for st in styles {
+            let q = normalize(st);
+            let hits: Vec<&FontFile> = family.files.iter().filter(|f| file_matches_style(f, &q)).collect();
+            if hits.is_empty() {
+                let avail: Vec<String> = family.files.iter().map(describe_file).collect();
+                return invalid(format!("`{}` has no style `{st}`; available: {}", family.family, avail.join(", ")));
+            }
+            for h in hits {
+                if !out.iter().any(|o| std::ptr::eq(*o, h)) {
+                    out.push(h);
+                }
+            }
+        }
+        Ok(out)
     }
 
     /// Searches family names. The query is case- and space-insensitive; an empty query matches
@@ -509,6 +621,56 @@ mod tests {
         let ps: Vec<String> = (0..MAX_LIST + 1).map(|i| format!("P{i}")).collect();
         let psr: Vec<&str> = ps.iter().map(String::as_str).collect();
         assert!(parse(&with_file(file("ofl/a/A.ttf", &psr))).is_err());
+    }
+
+    #[test]
+    fn rejects_duplicate_family_names_case_insensitively() {
+        let a = fam("Roboto", "SANS_SERIF", &[], vec![file("ofl/roboto/R.ttf", &[])]);
+        let b = fam("ROBOTO", "SANS_SERIF", &[], vec![file("ofl/roboto2/R.ttf", &[])]);
+        let e = parse(&index(vec![a.clone(), b])).unwrap_err();
+        assert!(e.to_string().contains("listed twice"), "{e}");
+        assert!(parse(&index(vec![a.clone(), a])).is_err());
+    }
+
+    #[test]
+    fn slug_comes_from_the_directory() {
+        let c = parse(&sample()).unwrap();
+        assert_eq!(c.family("Noto Sans JP").and_then(Family::slug).as_deref(), Some("notosansjp"));
+        for bad in ["ofl/Upper/A.ttf", "ofl/has space/A.ttf", "ofl/x.ttf", "ofl/a.b/A.ttf", "ofl/%2e/A.ttf"] {
+            assert!(parse(&with_file(file(bad, &[]))).is_err(), "{bad}");
+        }
+        let long = format!("ofl/{}/A.ttf", "a".repeat(65));
+        assert!(parse(&with_file(file(&long, &[]))).is_err());
+        // Files of one family in two directories are rejected.
+        let two = index(vec![fam("A", "DISPLAY", &[], vec![file("ofl/a/A.ttf", &[]), file("ofl/b/B.ttf", &[])])]);
+        assert!(parse(&two).is_err());
+        // A family without files has no slug but is a valid entry.
+        let none = parse(&index(vec![fam("A", "DISPLAY", &[], vec![])])).unwrap();
+        assert!(none.families().first().and_then(Family::slug).is_none());
+    }
+
+    #[test]
+    fn files_for_selects_by_style() {
+        let mut bold = file("ofl/inter/Inter-Bold.ttf", &["Inter-Bold"]);
+        bold["weight"] = json!(700);
+        let mut it = file("ofl/inter/Inter-Italic.ttf", &["Inter-Italic"]);
+        it["style"] = json!("italic");
+        let mut var = file("ofl/inter/Inter[wght].ttf", &["Inter-Light"]);
+        var["axes"] = json!([{"tag": "wght", "min": 100.0, "max": 900.0}]);
+        var["weight"] = json!(300);
+        let c = parse(&index(vec![fam("Inter", "SANS_SERIF", &[], vec![file("ofl/inter/Inter-Regular.ttf", &["Inter-Regular"]), bold, it, var])])).unwrap();
+        let f = c.family("inter").unwrap();
+        let styles = |v: &[&str]| c.files_for(f, &v.iter().map(|s| s.to_string()).collect::<Vec<_>>()).map(|v| v.iter().map(|x| x.path.rsplit('/').next().unwrap().to_string()).collect::<Vec<_>>());
+        assert_eq!(styles(&[]).unwrap().len(), 4);
+        assert_eq!(styles(&["Regular"]).unwrap(), ["Inter-Regular.ttf", "Inter[wght].ttf"]);
+        assert_eq!(styles(&["bold"]).unwrap(), ["Inter-Bold.ttf", "Inter[wght].ttf"]);
+        assert_eq!(styles(&["400italic"]).unwrap(), ["Inter-Italic.ttf"]);
+        assert_eq!(styles(&["Inter-Bold"]).unwrap(), ["Inter-Bold.ttf"]);
+        assert_eq!(styles(&["regular", "Bold", "regular"]).unwrap().len(), 3);
+        let e = styles(&["blackitalic"]).unwrap_err();
+        assert!(e.to_string().contains("no style") && e.to_string().contains("available"), "{e}");
+        assert!(styles(&["../x"]).is_err());
+        assert!(styles(&["99999"]).is_err());
     }
 
     #[test]
