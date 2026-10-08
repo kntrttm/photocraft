@@ -183,6 +183,7 @@ pub fn authorize_engine_command(id: &str, params: &Value) -> Result<(), Automati
         || command_uses_ambient_path(id, params)
         || profile_command_may_read_ambient(id, params)
         || preferences_may_grant_ambient_paths(id, params)
+        || preferences_may_enable_online_fonts(id, params)
         || params_contain_ambient_path(id, params)
     {
         return Err(command_error(id));
@@ -248,6 +249,28 @@ fn preferences_may_grant_ambient_paths(id: &str, params: &Value) -> bool {
     let direct = params.get("path").and_then(Value::as_str).is_some_and(preference_uses_ambient_filesystem);
     let batch = params.get("values").and_then(Value::as_object).is_some_and(|values| values.keys().any(|path| preference_uses_ambient_filesystem(path)));
     direct || batch
+}
+
+/// Online fonts are the user's consent to network access (Preferences > Type > Allow Online
+/// Fonts): an untrusted automation client must not be able to switch it on for itself.
+fn preferences_may_enable_online_fonts(id: &str, params: &Value) -> bool {
+    if id != "prefs.set" {
+        return false;
+    }
+    let direct = params.get("path").and_then(Value::as_str).is_some_and(preference_is_online_fonts);
+    let batch = params.get("values").and_then(Value::as_object).is_some_and(|values| values.keys().any(|path| preference_is_online_fonts(path)));
+    direct || batch
+}
+
+/// `type.allowOnlineFonts`, or anything that could carry it: the whole `type` section or all
+/// preferences.
+fn preference_is_online_fonts(path: &str) -> bool {
+    let mut segments = path.split('.').filter(|segment| !segment.is_empty());
+    match (segments.next(), segments.next()) {
+        (None, _) | (Some("type"), None) => true,
+        (Some("type"), Some(key)) => key.eq_ignore_ascii_case("allowOnlineFonts"),
+        _ => false,
+    }
 }
 
 fn preference_uses_ambient_filesystem(path: &str) -> bool {
@@ -627,6 +650,21 @@ mod tests {
             authorize_engine_command("prefs.set", &serde_json::json!({"values": {"interface.language": "fr", "historyLog.filePath": "/outside/log"}})).is_err()
         );
         assert!(authorize_engine_command("prefs.set", &serde_json::json!({"path": "interface.language", "value": "fr"})).is_ok());
+    }
+
+    /// Allow Online Fonts is the user's consent to network access: an untrusted client cannot
+    /// switch it on (directly, in a batch, through the `type` section or the whole tree).
+    #[test]
+    fn automation_cannot_enable_online_fonts() {
+        for path in ["type.allowOnlineFonts", "type.ALLOWONLINEFONTS", ".type..allowOnlineFonts", "type", "", "."] {
+            assert!(authorize_engine_command("prefs.set", &serde_json::json!({"path": path, "value": true})).is_err(), "{path}");
+        }
+        assert!(authorize_engine_command("prefs.set", &serde_json::json!({"values": {"interface.language": "fr", "type.allowOnlineFonts": true}})).is_err());
+        // Other type preferences and unrelated sections stay settable.
+        assert!(authorize_engine_command("prefs.set", &serde_json::json!({"path": "type.smartQuotes", "value": false})).is_ok());
+        assert!(authorize_engine_command("prefs.set", &serde_json::json!({"values": {"type.fontPreview": "large"}})).is_ok());
+        // The font commands themselves are allowed (they check the preference).
+        assert!(authorize_engine_command("type.fonts.install", &serde_json::json!({"family": "Roboto"})).is_ok());
     }
 
     #[test]

@@ -25,6 +25,7 @@ path = "src/main.rs"
 [dependencies]
 photocraft-automation = { path = "../../crates/automation" }
 photocraft-engine = { workspace = true }
+photocraft-fontfetch = { workspace = true }
 photocraft-io = { workspace = true }
 photocraft-format = { path = "../../crates/format" }
 photocraft-codecs = { workspace = true }

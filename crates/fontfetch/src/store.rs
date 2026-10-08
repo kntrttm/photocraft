@@ -327,7 +327,7 @@ mod tests {
         assert!(store.list().is_empty(), "a missing root is an empty store");
         let (rec, files) = record("notosansjp", "Noto Sans JP", &[("NotoSansJP[wght].ttf", b"font-bytes"), ("B.otf", b"more")], Some("OFL.txt"));
         store.write_family(&rec, &files, Some(b"licence")).unwrap();
-        assert_eq!(store.list(), [rec.clone()]);
+        assert_eq!(store.list(), std::slice::from_ref(&rec));
         assert_eq!(entries(&store.root().join("notosansjp")), ["B.otf", "NotoSansJP[wght].ttf", "OFL.txt", "manifest.json"]);
         assert_eq!(store.read_file("notosansjp", "B.otf").unwrap(), b"more");
         assert_eq!(store.file_path("notosansjp", "B.otf"), Some(store.root().join("notosansjp/B.otf")));

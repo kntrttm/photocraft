@@ -345,6 +345,11 @@ fn main() -> eframe::Result {
                 }
             }
             let mut app = PhotocraftApp::new(Session::new(), services);
+            // Google Fonts: download services, and the fonts downloaded earlier registered from
+            // disk (no network at startup; downloads need Preferences > Type > Allow Online Fonts).
+            if let Some(dir) = services::config_dir() {
+                photocraft_fontfetch::attach(&mut app.session, &dir);
+            }
             app.integrated_titlebar = cfg!(target_os = "macos");
             app.custom_titlebar = custom_titlebar;
             // Only the title bar's free gap drags the window, never the menus (mac_window.rs).

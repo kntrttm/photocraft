@@ -88,9 +88,13 @@ pub struct FontDb {
     retired: HashSet<String>,
 }
 
+/// A face as fontique's `unregister_font` identifies it.
+type FaceKey = (FamilyId, FontWidth, FontStyle, FontWeight);
+
 /// Faces a managed font set added: exactly what has to be unregistered again.
 struct Managed {
-    faces: Vec<(FamilyId, FontWidth, FontStyle, FontWeight)>,
+    files: Vec<std::path::PathBuf>,
+    faces: Vec<FaceKey>,
 }
 
 /// Outcome of [`FontDb::register_managed`].
@@ -247,6 +251,11 @@ impl FontDb {
         }
         #[cfg(not(target_arch = "wasm32"))]
         {
+            // Already registered from exactly these files (a second session in one process, a
+            // batch of files): nothing to do.
+            if self.managed.get(key).is_some_and(|m| m.files == files) {
+                return Ok(Registered::Families(self.managed_families(key)));
+            }
             self.unregister_managed(key);
             if self.has_family(family) {
                 return Ok(Registered::AlreadyAvailable);
@@ -261,7 +270,7 @@ impl FontDb {
             for n in &names {
                 self.retired.remove(&n.to_lowercase());
             }
-            self.managed.insert(key.to_string(), Managed { faces });
+            self.managed.insert(key.to_string(), Managed { files: files.to_vec(), faces });
             self.ps_cache.clear();
             self.refresh_generics();
             Ok(Registered::Families(names))
@@ -313,7 +322,7 @@ impl FontDb {
 
     /// The faces (and their family names) whose font source is one of `files`.
     #[cfg(not(target_arch = "wasm32"))]
-    fn faces_from(&mut self, files: &[std::path::PathBuf]) -> (Vec<(FamilyId, FontWidth, FontStyle, FontWeight)>, Vec<String>) {
+    fn faces_from(&mut self, files: &[std::path::PathBuf]) -> (Vec<FaceKey>, Vec<String>) {
         use parley::fontique::SourceKind;
         let all: Vec<String> = self.fcx.collection.family_names().map(str::to_string).collect();
         let (mut faces, mut names) = (Vec::new(), Vec::new());
@@ -633,7 +642,8 @@ mod tests {
     fn temp_dir(tag: &str) -> std::path::PathBuf {
         let d = std::env::temp_dir().join(format!("photocraft-fonts-{tag}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
-        std::fs::create_dir_all(&d).unwrap();
+        // A failure shows up as the test's own write failing.
+        let _ = std::fs::create_dir_all(&d);
         d
     }
 
@@ -651,7 +661,13 @@ mod tests {
         assert!(db.has_family("Zqxvk") && db.is_managed("zqxvk"));
         assert!(db.families().iter().any(|f| f == "Zqxvk"));
         assert_eq!(db.faces("Zqxvk").len(), 1);
-        // Registering again replaces (no duplicate face).
+        // Registering again is a no-op; registering other files under the key replaces them.
+        assert_eq!(db.register_managed("zqxvk", "Zqxvk", std::slice::from_ref(&file)).unwrap(), super::Registered::Families(vec!["Zqxvk".into()]));
+        assert_eq!(db.faces("Zqxvk").len(), 1);
+        let second = dir.join("Zqxvk-Copy.ttf");
+        std::fs::write(&second, renamed_inter("Zqxvk")).unwrap();
+        db.register_managed("zqxvk", "Zqxvk", &[second]).unwrap();
+        assert_eq!(db.faces("Zqxvk").len(), 1);
         db.register_managed("zqxvk", "Zqxvk", std::slice::from_ref(&file)).unwrap();
         assert_eq!(db.faces("Zqxvk").len(), 1);
         // A family that already exists is not registered again and is never unregistered.

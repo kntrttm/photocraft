@@ -125,6 +125,17 @@ impl Args {
 
 type R = Result<(), String>;
 
+/// Gives a headless session the Google Fonts download services: fonts downloaded earlier are
+/// registered (from disk, no network) and `type.fonts.*` work once Preferences > Type > Allow
+/// Online Fonts is on (a `run` script can set it with `prefs.set`; an untrusted MCP or control
+/// client cannot). Never fatal.
+fn with_fonts(mut h: Headless) -> Headless {
+    if let Some(dir) = photocraft_fontfetch::default_config_dir() {
+        photocraft_fontfetch::attach(&mut h.session, &dir);
+    }
+    h
+}
+
 /// [`run`] on the raw process arguments. An argument that is not valid Unicode is a usage error
 /// naming its position and a lossy rendering (exit 2), never a panic: `std::env::args()` aborts
 /// the process on one (issue #1108).
@@ -272,7 +283,7 @@ fn command_list(a: &Args) -> Result<Vec<(String, Value)>, String> {
 
 fn run_cmds(a: &Args, out: &mut dyn Write, err: &mut dyn Write) -> R {
     let opts = export_opts(a)?;
-    let mut h = Headless::trusted_local();
+    let mut h = with_fonts(Headless::trusted_local());
     match (a.positional.as_slice(), a.get("--new")) {
         ([file], None) => {
             let o = h.open(Path::new(file)).map_err(|e| e.to_string())?;
@@ -377,7 +388,7 @@ fn batch(a: &Args, out: &mut dyn Write, err: &mut dyn Write) -> R {
         let target_text = target.to_string_lossy();
         let r = (|| -> Result<Vec<String>, String> {
             written.check(&target_text)?;
-            let mut h = Headless::trusted_local();
+            let mut h = with_fonts(Headless::trusted_local());
             h.open(input).map_err(|e| e.to_string())?;
             for (id, p) in &actions {
                 h.command_run(id, p.clone()).map_err(|e| format!("`{id}`: {e}"))?;
@@ -448,7 +459,7 @@ fn commands(a: &Args, out: &mut dyn Write) -> R {
 
 fn serve(a: &Args, err: &mut dyn Write) -> R {
     use std::sync::{Arc, Mutex};
-    let h = Arc::new(Mutex::new(Headless::with_workspace(automation_workspace(a)?)));
+    let h = Arc::new(Mutex::new(with_fonts(Headless::with_workspace(automation_workspace(a)?))));
     match a.get("--port") {
         Some(port) => {
             let port: u16 = port.parse().map_err(|_| format!("bad --port `{port}`"))?;
@@ -479,7 +490,7 @@ fn mcp(a: &Args) -> R {
             let token = security::client_token(supplied.as_deref(), token_file.as_deref()).map_err(|e| e.to_string())?;
             PhotocraftMcp::bridge(addr, &token).map_err(|e| e.to_string())?
         }
-        None => PhotocraftMcp::headless_with_workspace(automation_workspace(a)?),
+        None => PhotocraftMcp::with_backend(photocraft_automation::Backend::Headless(std::sync::Arc::new(std::sync::Mutex::new(with_fonts(Headless::with_workspace(automation_workspace(a)?)))))),
     };
     let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().map_err(|e| e.to_string())?;
     rt.block_on(server.serve_stdio()).map_err(|e| e.to_string())

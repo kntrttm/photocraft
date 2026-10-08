@@ -466,6 +466,8 @@ fn finish_install(svc: &FontServices, d: Downloaded) -> Result<Value> {
     let families = if d.unchanged && managed {
         managed_families(&rec.slug)
     } else {
+        // New files under the same names (a reinstall) must replace what is registered.
+        photocraft_text::shared().lock().unwrap_or_else(PoisonError::into_inner).fonts.unregister_managed(&rec.slug);
         match register_record(svc, rec) {
             Ok(Registered::Families(v)) => v,
             Ok(Registered::AlreadyAvailable) => {
