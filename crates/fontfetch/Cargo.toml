@@ -1,0 +1,25 @@
+[package]
+name = "photocraft-fontfetch"
+description = "Google Fonts download services for the desktop app and CLI: a blocking HTTPS fetcher (ureq + rustls) and the app-private font store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+photocraft-engine = { workspace = true }
+photocraft-text = { workspace = true }
+photocraft-format = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+
+# Native only: the web build has no sockets (it gets its own fetcher in a later phase), but the
+# crate must still `cargo check --target wasm32-unknown-unknown`.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+# Blocking HTTP client, no async runtime. rustls (ring) for TLS, no OpenSSL / native-tls.
+# MIT OR Apache-2.0.
+ureq = { version = "3", default-features = false, features = ["rustls"] }
