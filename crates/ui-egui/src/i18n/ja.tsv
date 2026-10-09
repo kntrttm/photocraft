@@ -3358,3 +3358,7 @@ fontWeight	Italic	斜体
 @plural	{n} open document|{n} open documents	開いている {n} 個のドキュメント
 	Downloading missing fonts	不足しているフォントをダウンロード中
 	Loading Google Fonts	Google Fonts を読み込み中
+	Installing {family}	{family} をインストール中
+	Downloading {file}	{file} をダウンロード中
+	Downloading the licence	ライセンスをダウンロード中
+	Loading the font index	フォント一覧を読み込み中

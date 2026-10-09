@@ -2370,3 +2370,7 @@ fontWeight	Italic	Kursiv
 @plural	{n} open document|{n} open documents	{n} geöffnetem Dokument|{n} geöffneten Dokumenten
 	Downloading missing fonts	Fehlende Schriften werden heruntergeladen
 	Loading Google Fonts	Google Fonts wird geladen
+	Installing {family}	{family} wird installiert
+	Downloading {file}	{file} wird heruntergeladen
+	Downloading the licence	Lizenz wird heruntergeladen
+	Loading the font index	Schriftindex wird geladen

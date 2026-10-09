@@ -2401,3 +2401,7 @@ fontWeight	Italic	Corsivo
 @plural	{n} open document|{n} open documents	{n} documento aperto|{n} documenti aperti
 	Downloading missing fonts	Download dei font mancanti
 	Loading Google Fonts	Caricamento di Google Fonts
+	Installing {family}	Installazione di {family}
+	Downloading {file}	Download di {file}
+	Downloading the licence	Download della licenza
+	Loading the font index	Caricamento dell'indice dei font

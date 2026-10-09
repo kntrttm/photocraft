@@ -465,3 +465,21 @@ fn every_label_of_the_google_fonts_ui_is_translated() {
         }
     }
 }
+
+#[test]
+fn job_labels_and_messages_of_font_downloads_follow_the_ui_language() {
+    use crate::jobs_ui::{localize_label, localize_message};
+    assert_eq!(localize_label("Installing Anton"), "Installing Anton");
+    assert_eq!(localize_message("Downloading Regular.ttf"), "Downloading Regular.ttf");
+    for lang in crate::i18n::Lang::all().filter(|l| l.complete_menus()) {
+        let _g = crate::i18n::language_scope(lang);
+        let label = localize_label("Installing Anton");
+        assert!(label.contains("Anton") && label != "Installing Anton", "{}: {label}", lang.code());
+        assert_ne!(localize_label("Downloading missing fonts"), "Downloading missing fonts", "{}", lang.code());
+        assert_ne!(localize_message("Downloading Regular.ttf"), "Downloading Regular.ttf", "{}", lang.code());
+        assert!(localize_message("Downloading Regular.ttf").contains("Regular.ttf"));
+        assert_ne!(localize_message("Loading the font index"), "Loading the font index", "{}", lang.code());
+        assert_ne!(localize_message("Downloading the licence"), "Downloading the licence", "{}", lang.code());
+    }
+    assert_eq!(localize_message("something else"), "something else");
+}

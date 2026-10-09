@@ -2910,3 +2910,7 @@ fontWeight	Italic	기울임
 @plural	{n} open document|{n} open documents	열려 있는 문서 {n}개
 	Downloading missing fonts	누락된 글꼴 다운로드 중
 	Loading Google Fonts	Google Fonts 불러오는 중
+	Installing {family}	{family} 설치 중
+	Downloading {file}	{file} 다운로드 중
+	Downloading the licence	라이선스 다운로드 중
+	Loading the font index	글꼴 색인 불러오는 중

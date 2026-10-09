@@ -340,8 +340,12 @@ pub fn on_job(app: &mut PhotocraftApp, e: &JobEvent) -> bool {
                 (JobOutcome::Failed(err), Some(f)) => apply_install(app, &f, Err(err.clone())),
                 (JobOutcome::Cancelled, Some(f)) => app.ui.fonts.installing.retain(|i| i.family != f),
                 // Started by an agent: the font set changed all the same.
-                (JobOutcome::Done(_), None) => {
+                (JobOutcome::Done(v), None) => {
                     fonts_changed();
+                    let name = v.get("family").and_then(Value::as_str).unwrap_or_default();
+                    if v.get("alreadyAvailable").and_then(Value::as_bool) != Some(true) {
+                        app.ui.fonts.results.iter_mut().filter(|e| e.family.eq_ignore_ascii_case(name)).for_each(|e| e.installed = true);
+                    }
                     refresh_missing_dialogs(app);
                     return false;
                 }
@@ -403,7 +407,8 @@ pub fn tabs(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
 fn card(ui: &mut egui::Ui, t: &Tokens, add: impl FnOnce(&mut egui::Ui)) {
     egui::Frame::new().fill(t.card).stroke(egui::Stroke::new(1.0, t.card_border)).corner_radius(t.radius).inner_margin(12.0).show(ui, |ui| {
         ui.set_width(ui.available_width());
-        add(ui);
+        // Popups lay out justified (every line stretched to the width): body text is left-aligned.
+        ui.with_layout(egui::Layout::top_down(egui::Align::Min), add);
     });
 }
 

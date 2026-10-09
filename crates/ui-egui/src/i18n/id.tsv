@@ -2741,3 +2741,7 @@ fontWeight	Italic	Miring
 @plural	{n} open document|{n} open documents	{n} dokumen terbuka
 	Downloading missing fonts	Mengunduh font yang hilang
 	Loading Google Fonts	Memuat Google Fonts
+	Installing {family}	Memasang {family}
+	Downloading {file}	Mengunduh {file}
+	Downloading the licence	Mengunduh lisensi
+	Loading the font index	Memuat indeks font

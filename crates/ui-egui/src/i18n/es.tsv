@@ -2400,3 +2400,7 @@ fontWeight	Italic	Cursiva
 @plural	{n} open document|{n} open documents	{n} documento abierto|{n} documentos abiertos
 	Downloading missing fonts	Descargando las fuentes que faltan
 	Loading Google Fonts	Cargando Google Fonts
+	Installing {family}	Instalando {family}
+	Downloading {file}	Descargando {file}
+	Downloading the licence	Descargando la licencia
+	Loading the font index	Cargando el índice de fuentes

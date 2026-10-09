@@ -2308,3 +2308,7 @@ fontWeight	Italic	斜體
 @plural	{n} open document|{n} open documents	{n} 個開啟的文件
 	Downloading missing fonts	正在下載遺失的字型
 	Loading Google Fonts	正在載入 Google Fonts
+	Installing {family}	正在安裝 {family}
+	Downloading {file}	正在下載 {file}
+	Downloading the licence	正在下載授權
+	Loading the font index	正在載入字型索引

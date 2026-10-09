@@ -2754,3 +2754,7 @@ fontWeight	Italic	Italique
 @plural	{n} open document|{n} open documents	{n} document ouvert|{n} documents ouverts
 	Downloading missing fonts	Téléchargement des polices manquantes
 	Loading Google Fonts	Chargement de Google Fonts
+	Installing {family}	Installation de {family}
+	Downloading {file}	Téléchargement de {file}
+	Downloading the licence	Téléchargement de la licence
+	Loading the font index	Chargement de l'index des polices

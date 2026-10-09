@@ -2603,3 +2603,7 @@ fontWeight	Italic	Курсив
 @plural	{n} open document|{n} open documents	{n} открытый документ|{n} открытых документа|{n} открытых документов
 	Downloading missing fonts	Скачивание отсутствующих шрифтов
 	Loading Google Fonts	Загрузка Google Fonts
+	Installing {family}	Установка {family}
+	Downloading {file}	Скачивание {file}
+	Downloading the licence	Скачивание лицензии
+	Loading the font index	Загрузка индекса шрифтов

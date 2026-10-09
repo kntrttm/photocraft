@@ -2331,3 +2331,7 @@ fontWeight	Italic	Kurzíva
 @plural	{n} open document|{n} open documents	{n} otevřený dokument|{n} otevřené dokumenty|{n} otevřených dokumentů
 	Downloading missing fonts	Stahování chybějících písem
 	Loading Google Fonts	Načítání Google Fonts
+	Installing {family}	Instalace písma {family}
+	Downloading {file}	Stahování {file}
+	Downloading the licence	Stahování licence
+	Loading the font index	Načítání rejstříku písem

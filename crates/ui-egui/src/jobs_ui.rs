@@ -122,7 +122,7 @@ pub fn job_in_view(app: &PhotocraftApp) -> Option<JobInfo> {
 
 /// Cancel job `id` (the status bar's ×, the dialog's Cancel, Esc, closing an opening tab).
 pub fn cancel(app: &mut PhotocraftApp, id: JobId) {
-    let label = app.session.job(id).map(|j| j.label);
+    let label = app.session.job(id).map(|j| localize_label(&j.label));
     if app.session.cancel_job(id) {
         // The event (and its status text) arrives with the next poll; say so now as well.
         if let Some(l) = label {
@@ -183,15 +183,15 @@ fn on_event(app: &mut PhotocraftApp, e: JobEvent) {
         }
         JobOutcome::Done(_) => {
             app.sync_views();
-            app.ui.status = e.label;
+            app.ui.status = localize_label(&e.label);
             app.ui.status_error = false;
         }
         JobOutcome::Failed(err) => {
             app.sync_views();
-            notices::error(app, format!("{}: {err}", e.label));
+            notices::error(app, format!("{}: {err}", localize_label(&e.label)));
         }
         JobOutcome::Cancelled => {
-            app.ui.status = crate::i18n::fmt(tl!("Cancelled {label}"), &[("label", &e.label)]);
+            app.ui.status = crate::i18n::fmt(tl!("Cancelled {label}"), &[("label", &localize_label(&e.label))]);
             app.ui.status_error = false;
         }
     }
@@ -282,7 +282,7 @@ pub fn status_progress(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
     ui.label(RichText::new(percent(&j)).color(t.text_dim).size(11.5).monospace());
     let (br, _) = ui.allocate_exact_size(vec2(bar_w, bar_h), Sense::hover());
     bar(ui, br, shown_fraction(&j), &t);
-    let label = if more > 0 { format!("{} (+{more})", tl!(&j.label)) } else { tl!(&j.label).to_owned() };
+    let label = if more > 0 { format!("{} (+{more})", localize_label(&j.label)) } else { localize_label(&j.label) };
     ui.label(RichText::new(label).color(t.text_dim).size(12.0));
     if xresp.clicked() {
         cancel(app, j.id);
@@ -302,11 +302,11 @@ pub fn dialog(app: &mut PhotocraftApp, ctx: &egui::Context) {
     // Photoshop doesn't dim the window behind its progress dialog either.
     let modal = egui::Modal::new(egui::Id::new("job-progress")).backdrop_color(Color32::from_black_alpha(36)).show(ctx, |ui| {
         ui.set_width(360.0);
-        ui.label(RichText::new(tl!(&j.label)).font(crate::theme::semibold(15.0)));
+        ui.label(RichText::new(localize_label(&j.label)).font(crate::theme::semibold(15.0)));
         ui.add_space(4.0);
         crate::widgets::hairline(ui);
         ui.add_space(10.0);
-        let msg = if j.message.is_empty() || j.message == j.label { tl!("Working…").to_string() } else { j.message.clone() };
+        let msg = if j.message.is_empty() || j.message == j.label { tl!("Working…").to_string() } else { localize_message(&j.message) };
         ui.label(RichText::new(msg).color(t.text_dim));
         ui.add_space(8.0);
         let (br, _) = ui.allocate_exact_size(vec2(ui.available_width(), 8.0), Sense::hover());
@@ -328,6 +328,27 @@ pub fn dialog(app: &mut PhotocraftApp, ctx: &egui::Context) {
     let _ = modal;
     if cancel_it {
         cancel(app, j.id);
+    }
+}
+
+/// A job's label in the UI language. Engine labels stay English for the CLI and MCP; the ones
+/// that carry a name ("Installing Inter") are catalogued as templates.
+pub fn localize_label(label: &str) -> String {
+    match label.strip_prefix("Installing ") {
+        Some(family) if !family.is_empty() => crate::i18n::fmt(tl!("Installing {family}"), &[("family", family)]),
+        _ => tl!(label).to_string(),
+    }
+}
+
+/// A job's progress message in the UI language (the Google Fonts downloads' messages are catalogued).
+pub fn localize_message(msg: &str) -> String {
+    match msg {
+        "Loading the font index" => tl!("Loading the font index").to_string(),
+        "Downloading the licence" => tl!("Downloading the licence").to_string(),
+        _ => match msg.strip_prefix("Downloading ") {
+            Some(file) if !file.is_empty() => crate::i18n::fmt(tl!("Downloading {file}"), &[("file", file)]),
+            _ => msg.to_string(),
+        },
     }
 }
 
