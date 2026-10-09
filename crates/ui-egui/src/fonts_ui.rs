@@ -944,8 +944,15 @@ pub fn confirm(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Result<Value,
 
 /// `ui.set {fonts: {tab?, query?, category?, subset?}}`: the picker's view state.
 pub fn set(app: &mut PhotocraftApp, v: &Value) -> Result<(), String> {
+    app.ui.fonts = parse_set(&app.ui.fonts, v)?;
+    Ok(())
+}
+
+/// The pure half of [`set`]: validates `v` and returns the state it would produce, without
+/// touching the app, so `ui.set` can validate before applying its first field (#412).
+pub fn parse_set(current: &FontsUi, v: &Value) -> Result<FontsUi, String> {
     let Some(o) = v.as_object() else { return Err("fonts must be an object".into()) };
-    let mut next = app.ui.fonts.clone();
+    let mut next = current.clone();
     for (k, val) in o {
         match k.as_str() {
             "tab" => next.tab = serde_json::from_value(val.clone()).map_err(|_| "fonts.tab must be fonts or findMore".to_string())?,
@@ -963,8 +970,7 @@ pub fn set(app: &mut PhotocraftApp, v: &Value) -> Result<(), String> {
             other => return Err(format!("unknown fonts field `{other}` (tab, query, category, subset)")),
         }
     }
-    app.ui.fonts = next;
-    Ok(())
+    Ok(next)
 }
 
 #[cfg(test)]

@@ -397,6 +397,11 @@ fn dispatch(app: &mut PhotocraftApp, ctx: &egui::Context, req: &ControlRequest) 
                     }
                     None => None,
                 };
+                // The font picker's view state (#412: validated here, assigned below).
+                let fonts = match p.get("fonts") {
+                    Some(v) => Some(crate::fonts_ui::parse_set(&app.ui.fonts, v)?),
+                    None => None,
+                };
 
                 // Apply (nothing below can fail).
                 if let Some(t) = tool {
@@ -498,8 +503,8 @@ fn dispatch(app: &mut PhotocraftApp, ctx: &egui::Context, req: &ControlRequest) 
                 if let Some(size) = brush_size {
                     app.run("tools.setBrush", json!({"brush": {"size": size}})).map_err(|e| e.to_string())?;
                 }
-                if let Some(v) = p.get("fonts") {
-                    crate::fonts_ui::set(app, v).map_err(|e| e.to_string())?;
+                if let Some(next) = fonts {
+                    app.ui.fonts = next;
                 }
                 Ok(Value::Null)
             })();
@@ -1163,6 +1168,20 @@ mod tests {
             assert_eq!(r["ok"], false, "{params}: {r}");
             assert_eq!(app.ui.tool, before, "{params}: a rejected call applies none of its fields");
         }
+        // A bad `fonts` value is validated up front too, so it applies nothing else.
+        let fonts_before = serde_json::to_value(&app.ui.fonts).unwrap_or_default();
+        for params in [json!({"tool": "move", "fonts": {"tab": "bogus"}}), json!({"tool": "move", "fonts": {"nope": 1}}), json!({"tool": "move", "fonts": "x"})] {
+            let r = call(&mut app, &ctx, "ui.set", params.clone());
+            assert_eq!(r["ok"], false, "{params}: {r}");
+            assert_eq!(app.ui.tool, before, "{params}: a rejected call applies none of its fields");
+            assert_eq!(serde_json::to_value(&app.ui.fonts).unwrap_or_default(), fonts_before, "{params}");
+        }
+        // A valid `fonts` value together with other fields applies all of them.
+        let r = call(&mut app, &ctx, "ui.set", json!({"tool": "move", "fonts": {"tab": "findMore", "query": "roboto"}}));
+        assert_eq!(r["ok"], true, "{r}");
+        assert_eq!(app.ui.tool, Tool::Move);
+        assert_eq!(app.ui.fonts.query, "roboto");
+        assert_eq!(serde_json::to_value(&app.ui.fonts.tab).unwrap_or_default(), json!("findMore"));
         // Wrong types and unknown nested keys are errors, not silent no-ops with ok:true.
         for params in [
             json!({"panels": "x"}),
