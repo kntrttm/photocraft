@@ -3293,3 +3293,71 @@ cameraRaw	Roughness	Chropowatość
 	Color to Alpha…	Kolor na alfę…
 	Transparency Threshold	Próg przezroczystości
 	Opacity Threshold	Próg krycia
+
+# Google Fonts
+	Allow online fonts	Zezwalaj na czcionki online
+	Fonts	Czcionki
+	Find More	Znajdź więcej
+	Search Google Fonts	Szukaj w Google Fonts
+	All categories	Wszystkie kategorie
+	Sans Serif	Bezszeryfowe
+	Serif	Szeryfowe
+	Display	Ozdobne
+	Handwriting	Pismo odręczne
+	Monospace	O stałej szerokości
+	All languages	Wszystkie języki
+	Latin	Łacińskie
+	Japanese	Japońskie
+	Korean	Koreańskie
+	Chinese (Simplified)	Chińskie (uproszczone)
+	Chinese (Traditional)	Chińskie (tradycyjne)
+	Cyrillic	Cyrylica
+	Greek	Greckie
+	Arabic	Arabskie
+	Hebrew	Hebrajskie
+	Thai	Tajskie
+	Devanagari	Dewanagari
+	Vietnamese	Wietnamskie
+	Variable font: only the default weight is available	Czcionka zmienna: dostępna tylko domyślna grubość
+	Installed	Zainstalowana
+	Download from Google Fonts	Pobierz z Google Fonts
+	Loading Google Fonts…	Wczytywanie Google Fonts…
+	No fonts found	Nie znaleziono czcionek
+	Showing {shown} of {total} fonts	Pokazano {shown} z {total} czcionek
+	Download fonts from Google Fonts?	Pobierać czcionki z Google Fonts?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	Zakładka „Znajdź więcej” wyświetla czcionki Google Fonts o otwartym kodzie. Lista czcionek i wybrane przez Ciebie czcionki są pobierane z Google Fonts przez jsDelivr i GitHub. Przy uruchamianiu PhotoCraft nic nie jest pobierane, a tę funkcję możesz w każdej chwili wyłączyć w Preferencje › Tekst.
+	Allow	Zezwól
+	Not now	Nie teraz
+	Online fonts are not available in this build.	Czcionki online nie są dostępne w tej wersji.
+	The Google Fonts list is not set up in this build.	Lista Google Fonts nie jest skonfigurowana w tej wersji.
+	Couldn't load Google Fonts	Nie udało się wczytać Google Fonts
+	Retry	Ponów
+	A font named “{family}” is already available and stays in use.	Czcionka „{family}” jest już dostępna i nadal będzie używana.
+	Downloaded {family}	Pobrano {family}
+	Downloaded: {fonts}	Pobrano: {fonts}
+	Manage Downloaded Fonts	Zarządzaj pobranymi czcionkami
+	Manage downloaded fonts…	Zarządzaj pobranymi czcionkami…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Nie ma jeszcze pobranych czcionek. Skorzystaj z zakładki „Znajdź więcej” w menu czcionek.
+	Family	Rodzina
+	License	Licencja
+	Remove anyway	Usuń mimo to
+	Keep	Zachowaj
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	Czcionka „{family}” jest używana ({layers}; {documents}). Po jej usunięciu te warstwy będą pokazywać brakujące czcionki.
+	“{family}” was removed. Affected text layers: {count}.	Usunięto czcionkę „{family}”. Dotknięte warstwy tekstowe: {count}.
+	“{family}” was removed.	Usunięto czcionkę „{family}”.
+	No fonts are missing.	Żadnych czcionek nie brakuje.
+	These fonts are not installed:	Te czcionki nie są zainstalowane:
+	Available on Google Fonts	Dostępna w Google Fonts
+	Don't replace	Nie zastępuj
+	Replace with	Zastąp przez
+	Allow online fonts to look for these fonts on Google Fonts.	Zezwól na czcionki online, aby wyszukać te czcionki w Google Fonts.
+	Downloading…	Pobieranie…
+	Downloading missing fonts	Pobieranie brakujących czcionek
+	Loading Google Fonts	Wczytywanie Google Fonts
+	Installing {family}	Instalowanie {family}
+	Downloading {file}	Pobieranie {file}
+	Downloading the licence	Pobieranie licencji
+	Loading the font index	Wczytywanie indeksu czcionek
+@plural	{n} style|{n} styles	{n} styl|{n} style|{n} stylów
+@plural	{n} text layer|{n} text layers	{n} warstwa tekstowa|{n} warstwy tekstowe|{n} warstw tekstowych
+@plural	{n} open document|{n} open documents	{n} otwarty dokument|{n} otwarte dokumenty|{n} otwartych dokumentów

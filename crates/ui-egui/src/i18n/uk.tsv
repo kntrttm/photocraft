@@ -3379,3 +3379,71 @@ cameraRaw	Masking	Маскування
 	Point Sample	Точкова вибірка
 	Sample Size:	Розмір зразка:
 	Show Sampling Ring	Показувати кільце вибірки
+
+# Google Fonts
+	Allow online fonts	Дозволити онлайн-шрифти
+	Fonts	Шрифти
+	Find More	Знайти ще
+	Search Google Fonts	Пошук у Google Fonts
+	All categories	Усі категорії
+	Sans Serif	Без засічок
+	Serif	З засічками
+	Display	Декоративні
+	Handwriting	Рукописні
+	Monospace	Моноширинні
+	All languages	Усі мови
+	Latin	Латиниця
+	Japanese	Японська
+	Korean	Корейська
+	Chinese (Simplified)	Китайська (спрощена)
+	Chinese (Traditional)	Китайська (традиційна)
+	Cyrillic	Кирилиця
+	Greek	Грецька
+	Arabic	Арабська
+	Hebrew	Іврит
+	Thai	Тайська
+	Devanagari	Деванагарі
+	Vietnamese	В'єтнамська
+	Variable font: only the default weight is available	Змінний шрифт: доступна лише типова насиченість
+	Installed	Установлено
+	Download from Google Fonts	Завантажити з Google Fonts
+	Loading Google Fonts…	Завантаження Google Fonts…
+	No fonts found	Шрифтів не знайдено
+	Showing {shown} of {total} fonts	Показано {shown} із {total} шрифтів
+	Download fonts from Google Fonts?	Завантажувати шрифти з Google Fonts?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	«Знайти ще» показує шрифти Google Fonts з відкритим кодом. Список шрифтів і вибрані вами шрифти завантажуються з Google Fonts через jsDelivr і GitHub. Під час запуску PhotoCraft нічого не завантажується, а вимкнути цю функцію можна будь-коли в розділі «Налаштування › Текст».
+	Allow	Дозволити
+	Not now	Не зараз
+	Online fonts are not available in this build.	У цій збірці онлайн-шрифти недоступні.
+	The Google Fonts list is not set up in this build.	У цій збірці список Google Fonts не налаштовано.
+	Couldn't load Google Fonts	Не вдалося завантажити Google Fonts
+	Retry	Повторити
+	A font named “{family}” is already available and stays in use.	Шрифт «{family}» уже доступний і продовжує використовуватися.
+	Downloaded {family}	Завантажено шрифт {family}
+	Downloaded: {fonts}	Завантажено: {fonts}
+	Manage Downloaded Fonts	Керування завантаженими шрифтами
+	Manage downloaded fonts…	Керування завантаженими шрифтами…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Завантажених шрифтів поки немає. Знайдіть їх на вкладці «Знайти ще» в меню шрифтів.
+	Family	Сімейство
+	License	Ліцензія
+	Remove anyway	Усе одно вилучити
+	Keep	Залишити
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	«{family}» використовується ({layers}; {documents}). Після вилучення ці шари показуватимуться як шари з відсутнім шрифтом.
+	“{family}” was removed. Affected text layers: {count}.	Шрифт «{family}» вилучено. Уражено текстових шарів: {count}.
+	“{family}” was removed.	Шрифт «{family}» вилучено.
+	No fonts are missing.	Відсутніх шрифтів немає.
+	These fonts are not installed:	Ці шрифти не встановлено:
+	Available on Google Fonts	Доступний у Google Fonts
+	Don't replace	Не замінювати
+	Replace with	Замінити на
+	Allow online fonts to look for these fonts on Google Fonts.	Дозвольте онлайн-шрифти, щоб шукати ці шрифти в Google Fonts.
+	Downloading…	Завантаження…
+	Downloading missing fonts	Завантаження відсутніх шрифтів
+	Loading Google Fonts	Завантаження Google Fonts
+	Installing {family}	Установлення {family}
+	Downloading {file}	Завантаження {file}
+	Downloading the licence	Завантаження ліцензії
+	Loading the font index	Завантаження індексу шрифтів
+@plural	{n} style|{n} styles	{n} начерк|{n} начерки|{n} начерків
+@plural	{n} text layer|{n} text layers	{n} текстовий шар|{n} текстові шари|{n} текстових шарів
+@plural	{n} open document|{n} open documents	{n} відкритий документ|{n} відкриті документи|{n} відкритих документів

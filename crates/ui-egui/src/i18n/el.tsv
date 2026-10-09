@@ -3382,3 +3382,69 @@ fontWeight	Thin	Πολύ λεπτά
 	Color to Alpha…	Χρώμα σε άλφα…
 	Transparency Threshold	Κατώφλι διαφάνειας
 	Opacity Threshold	Κατώφλι αδιαφάνειας
+
+# Google Fonts
+	Allow online fonts	Να επιτρέπονται οι γραμματοσειρές online
+	Fonts	Γραμματοσειρές
+	Find More	Εύρεση περισσότερων
+	Search Google Fonts	Αναζήτηση στο Google Fonts
+	All categories	Όλες οι κατηγορίες
+	Sans Serif	Χωρίς πατούρες
+	Serif	Με πατούρες
+	Handwriting	Χειρόγραφες
+	Monospace	Σταθερού πλάτους
+	All languages	Όλες οι γλώσσες
+	Latin	Λατινικά
+	Japanese	Ιαπωνικά
+	Korean	Κορεατικά
+	Chinese (Simplified)	Κινεζικά (απλοποιημένα)
+	Chinese (Traditional)	Κινεζικά (παραδοσιακά)
+	Cyrillic	Κυριλλικά
+	Greek	Ελληνικά
+	Arabic	Αραβικά
+	Hebrew	Εβραϊκά
+	Thai	Ταϊλανδικά
+	Devanagari	Ντεβαναγκάρι
+	Vietnamese	Βιετναμικά
+	Variable font: only the default weight is available	Μεταβλητή γραμματοσειρά: διατίθεται μόνο το προεπιλεγμένο πάχος
+	Installed	Εγκατεστημένη
+	Download from Google Fonts	Λήψη από το Google Fonts
+	Loading Google Fonts…	Φόρτωση του Google Fonts…
+	No fonts found	Δεν βρέθηκαν γραμματοσειρές
+	Showing {shown} of {total} fonts	Εμφάνιση {shown} από {total} γραμματοσειρές
+	Download fonts from Google Fonts?	Λήψη γραμματοσειρών από το Google Fonts;
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	Η καρτέλα «Εύρεση περισσότερων» εμφανίζει τις γραμματοσειρές ανοικτού κώδικα του Google Fonts. Η λίστα γραμματοσειρών και οι γραμματοσειρές που επιλέγετε λαμβάνονται από το Google Fonts μέσω jsDelivr και GitHub. Τίποτα δεν λαμβάνεται κατά την εκκίνηση του PhotoCraft και μπορείτε να το απενεργοποιήσετε ανά πάσα στιγμή στις Προτιμήσεις › Κείμενο.
+	Allow	Να επιτραπεί
+	Not now	Όχι τώρα
+	Online fonts are not available in this build.	Οι γραμματοσειρές online δεν είναι διαθέσιμες σε αυτή την έκδοση.
+	The Google Fonts list is not set up in this build.	Η λίστα του Google Fonts δεν έχει ρυθμιστεί σε αυτή την έκδοση.
+	Couldn't load Google Fonts	Δεν ήταν δυνατή η φόρτωση του Google Fonts
+	A font named “{family}” is already available and stays in use.	Μια γραμματοσειρά με το όνομα «{family}» είναι ήδη διαθέσιμη και συνεχίζει να χρησιμοποιείται.
+	Downloaded {family}	Λήφθηκε η γραμματοσειρά {family}
+	Downloaded: {fonts}	Λήφθηκαν: {fonts}
+	Manage Downloaded Fonts	Διαχείριση ληφθεισών γραμματοσειρών
+	Manage downloaded fonts…	Διαχείριση ληφθεισών γραμματοσειρών…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Δεν υπάρχουν ακόμη ληφθείσες γραμματοσειρές. Χρησιμοποιήστε την καρτέλα «Εύρεση περισσότερων» του μενού γραμματοσειρών για να λάβετε.
+	Family	Οικογένεια
+	License	Άδεια χρήσης
+	Remove anyway	Αφαίρεση παρ' όλα αυτά
+	Keep	Διατήρηση
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	Η «{family}» χρησιμοποιείται από {layers} σε {documents}. Αν την αφαιρέσετε, αυτά τα επίπεδα θα εμφανίζουν γραμματοσειρές που λείπουν.
+	“{family}” was removed. Affected text layers: {count}.	Η «{family}» αφαιρέθηκε. Επηρεασμένα επίπεδα κειμένου: {count}.
+	“{family}” was removed.	Η «{family}» αφαιρέθηκε.
+	No fonts are missing.	Δεν λείπουν γραμματοσειρές.
+	These fonts are not installed:	Αυτές οι γραμματοσειρές δεν είναι εγκατεστημένες:
+	Available on Google Fonts	Διαθέσιμη στο Google Fonts
+	Don't replace	Να μην αντικατασταθεί
+	Replace with	Αντικατάσταση με
+	Allow online fonts to look for these fonts on Google Fonts.	Επιτρέψτε τις γραμματοσειρές online για να αναζητηθούν αυτές οι γραμματοσειρές στο Google Fonts.
+	Downloading…	Λήψη…
+	Downloading missing fonts	Λήψη γραμματοσειρών που λείπουν
+	Loading Google Fonts	Φόρτωση του Google Fonts
+	Installing {family}	Εγκατάσταση της {family}
+	Downloading {file}	Λήψη του {file}
+	Downloading the licence	Λήψη της άδειας χρήσης
+	Loading the font index	Φόρτωση του ευρετηρίου γραμματοσειρών
+@plural	{n} style|{n} styles	{n} στυλ|{n} στυλ
+@plural	{n} text layer|{n} text layers	{n} επίπεδο κειμένου|{n} επίπεδα κειμένου
+@plural	{n} open document|{n} open documents	{n} ανοιχτό έγγραφο|{n} ανοιχτά έγγραφα

@@ -3457,3 +3457,69 @@ cameraRaw	Whites	Witten
 	Point Sample	Puntmonster
 	Sample Size:	Monstergrootte:
 	Show Sampling Ring	Monsterring tonen
+
+# Google Fonts
+	Allow online fonts	Online lettertypen toestaan
+	Fonts	Lettertypen
+	Find More	Meer zoeken
+	Search Google Fonts	Zoeken in Google Fonts
+	All categories	Alle categorieën
+	Sans Serif	Schreefloos
+	Serif	Met schreef
+	Handwriting	Handschrift
+	Monospace	Monospace
+	All languages	Alle talen
+	Latin	Latijns
+	Japanese	Japans
+	Korean	Koreaans
+	Chinese (Simplified)	Chinees (vereenvoudigd)
+	Chinese (Traditional)	Chinees (traditioneel)
+	Cyrillic	Cyrillisch
+	Greek	Grieks
+	Arabic	Arabisch
+	Hebrew	Hebreeuws
+	Thai	Thai
+	Devanagari	Devanagari
+	Vietnamese	Vietnamees
+	Variable font: only the default weight is available	Variabel lettertype: alleen het standaardgewicht is beschikbaar
+	Installed	Geïnstalleerd
+	Download from Google Fonts	Downloaden van Google Fonts
+	Loading Google Fonts…	Google Fonts laden…
+	No fonts found	Geen lettertypen gevonden
+	Showing {shown} of {total} fonts	{shown} van {total} lettertypen getoond
+	Download fonts from Google Fonts?	Lettertypen downloaden van Google Fonts?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	Meer zoeken toont de opensourcelettertypen van Google Fonts. De lijst met lettertypen en de lettertypen die je kiest worden via jsDelivr en GitHub van Google Fonts gedownload. Bij het starten van PhotoCraft wordt niets gedownload en je kunt dit op elk moment uitschakelen in Voorkeuren › Tekst.
+	Allow	Toestaan
+	Not now	Niet nu
+	Online fonts are not available in this build.	Online lettertypen zijn niet beschikbaar in deze build.
+	The Google Fonts list is not set up in this build.	De lijst met Google Fonts is niet ingesteld in deze build.
+	Couldn't load Google Fonts	Google Fonts kon niet worden geladen
+	A font named “{family}” is already available and stays in use.	Een lettertype met de naam “{family}” is al beschikbaar en blijft in gebruik.
+	Downloaded {family}	{family} gedownload
+	Downloaded: {fonts}	Gedownload: {fonts}
+	Manage Downloaded Fonts	Gedownloade lettertypen beheren
+	Manage downloaded fonts…	Gedownloade lettertypen beheren…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Nog geen gedownloade lettertypen. Gebruik het tabblad Meer zoeken in het lettertypemenu om er te vinden.
+	Family	Familie
+	License	Licentie
+	Remove anyway	Toch verwijderen
+	Keep	Behouden
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	“{family}” wordt gebruikt door {layers} in {documents}. Als je het verwijdert, tonen die lagen ontbrekende lettertypen.
+	“{family}” was removed. Affected text layers: {count}.	“{family}” is verwijderd. Betrokken tekstlagen: {count}.
+	“{family}” was removed.	“{family}” is verwijderd.
+	No fonts are missing.	Er ontbreken geen lettertypen.
+	These fonts are not installed:	Deze lettertypen zijn niet geïnstalleerd:
+	Available on Google Fonts	Beschikbaar in Google Fonts
+	Don't replace	Niet vervangen
+	Replace with	Vervangen door
+	Allow online fonts to look for these fonts on Google Fonts.	Sta online lettertypen toe om deze lettertypen in Google Fonts te zoeken.
+	Downloading…	Downloaden…
+	Downloading missing fonts	Ontbrekende lettertypen downloaden
+	Loading Google Fonts	Google Fonts laden
+	Installing {family}	{family} installeren
+	Downloading {file}	{file} downloaden
+	Downloading the licence	Licentie downloaden
+	Loading the font index	Lettertype-index laden
+@plural	{n} style|{n} styles	{n} stijl|{n} stijlen
+@plural	{n} text layer|{n} text layers	{n} tekstlaag|{n} tekstlagen
+@plural	{n} open document|{n} open documents	{n} geopend document|{n} geopende documenten
