@@ -2337,3 +2337,5 @@ fontWeight	Italic	斜体
 @plural	{n} style|{n} styles	{n} 种样式
 @plural	{n} text layer|{n} text layers	{n} 个文字图层
 @plural	{n} open document|{n} open documents	{n} 个打开的文档
+	Downloading missing fonts	正在下载缺失的字体
+	Loading Google Fonts	正在加载 Google Fonts

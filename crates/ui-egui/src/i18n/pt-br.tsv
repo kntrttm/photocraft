@@ -2759,3 +2759,5 @@ fontWeight	Italic	Itálico
 @plural	{n} style|{n} styles	{n} estilo|{n} estilos
 @plural	{n} text layer|{n} text layers	{n} camada de texto|{n} camadas de texto
 @plural	{n} open document|{n} open documents	{n} documento aberto|{n} documentos abertos
+	Downloading missing fonts	Baixando as fontes ausentes
+	Loading Google Fonts	Carregando o Google Fonts

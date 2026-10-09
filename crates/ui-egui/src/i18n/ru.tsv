@@ -2601,3 +2601,5 @@ fontWeight	Italic	Курсив
 @plural	{n} style|{n} styles	{n} начертание|{n} начертания|{n} начертаний
 @plural	{n} text layer|{n} text layers	{n} текстовый слой|{n} текстовых слоя|{n} текстовых слоёв
 @plural	{n} open document|{n} open documents	{n} открытый документ|{n} открытых документа|{n} открытых документов
+	Downloading missing fonts	Скачивание отсутствующих шрифтов
+	Loading Google Fonts	Загрузка Google Fonts

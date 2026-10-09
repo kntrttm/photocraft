@@ -15,9 +15,17 @@
 //!
 //! `--script` is a JSON array of `[method, params]` control-protocol calls (see
 //! docs/control-protocol.md), applied in order with a few frames between them.
+//! `--dev-fonts` attaches a fake Google Fonts backend (no network: a demo index, fonts served from
+//! memory; Oswald's download never finishes, to show progress) and turns online fonts on with
+//! `--allow-online-fonts`, so the font picker's Find More tab can be captured.
+//! `--click-wait-ms N` keeps rendering N ms after each click.
 //! `--right-click-at X,Y` opens a screen-space context menu after the script, including panel
 //! and document-tab menus that are outside the document-coordinate control pointer.
 //! `--click-at X,Y` opens a screen-space menu (for example the top Select menu) after the script.
+
+// The fake Google Fonts backend of the shell's tests (`--dev-fonts`).
+#[path = "../tests/support/dev_fonts.rs"]
+mod dev_fonts;
 
 use photocraft_ui_egui::control::{ControlRequest, Outcome, handle};
 use photocraft_ui_egui::{PhotocraftApp, Services};
@@ -59,7 +67,10 @@ fn main() {
     // `--background-jobs`: long commands run as background jobs, as in the desktop app (#210).
     let background_jobs = args.iter().any(|a| a == "--background-jobs");
     let custom_titlebar = args.iter().any(|a| a == "--custom-titlebar");
+    let dev_fonts = args.iter().any(|a| a == "--dev-fonts");
+    let allow_online_fonts = args.iter().any(|a| a == "--allow-online-fonts");
     // `--settle-ms N`: keep rendering frames for N ms before the capture (e.g. mid-job).
+    let click_wait_ms: u64 = arg(&args, "--click-wait-ms").and_then(|s| s.parse().ok()).unwrap_or(0);
     let settle_ms: u64 = arg(&args, "--settle-ms").and_then(|s| s.parse().ok()).unwrap_or(0);
     let mut harness =
         egui_kittest::Harness::builder().with_size(egui::vec2(w, h)).with_pixels_per_point(scale).with_max_steps(64).wgpu().build_eframe(move |cc| {
@@ -67,7 +78,28 @@ fn main() {
             let mut services = services;
             services.is_wayland = wayland_notice;
             services.xwayland_command = wayland_notice.then(|| "WAYLAND_DISPLAY= photocraft".into());
-            let mut app = PhotocraftApp::new(photocraft_engine::Session::new(), services);
+            let mut session = photocraft_engine::Session::new();
+            if dev_fonts {
+                let mk = |name, dir, files, size, category: &'static str, variable| dev_fonts::Fam { category, variable, ..dev_fonts::Fam::listed(name, dir, files, size) };
+                let mut oswald = mk("Oswald", "oswald", 3, 0, "SANS_SERIF", true);
+                oswald.hang_on = Some(1);
+                let fams = [
+                    mk("Noto Sans JP", "notosansjp", 1, 9_589_900, "SANS_SERIF", true),
+                    mk("Roboto Mono", "robotomono", 2, 540 << 10, "MONOSPACE", true),
+                    mk("Lora", "lora", 2, 560 << 10, "SERIF", true),
+                    oswald,
+                    mk("Pacifico", "pacifico", 1, 330 << 10, "HANDWRITING", false),
+                    mk("Playfair Display", "playfairdisplay", 2, 1_100_000, "SERIF", true),
+                    dev_fonts::Fam::real("Anton", "anton"),
+                    dev_fonts::Fam::real("Karla", "karla"),
+                ];
+                let fake = dev_fonts::DevFonts::new("snapshot", &fams);
+                fake.attach(&mut session);
+            }
+            if allow_online_fonts {
+                session.edit_prefs(|p| p.type_.allow_online_fonts = true);
+            }
+            let mut app = PhotocraftApp::new(session, services);
             app.background_jobs = background_jobs;
             app.custom_titlebar = custom_titlebar;
             // `--safe-gpu`: the CPU canvas, as the desktop app's `--safe-gpu` launch.
@@ -122,8 +154,17 @@ fn main() {
             eprintln!("{:>8.1} ms  {label}", t0.elapsed().as_secs_f64() * 1000.0);
         }
     }
-    for (flag, button) in [("--click-at", egui::PointerButton::Primary), ("--right-click-at", egui::PointerButton::Secondary)] {
-        let Some((x, y)) = arg(&args, flag).and_then(|s| s.split_once(',').and_then(|(x, y)| Some((x.parse::<f32>().ok()?, y.parse::<f32>().ok()?)))) else {
+    // Every `--click-at X,Y` / `--right-click-at X,Y` (in order, each followed by a few frames).
+    let clicks: Vec<(&str, egui::PointerButton)> = args
+        .windows(2)
+        .filter_map(|w| match w[0].as_str() {
+            "--click-at" => Some((w[1].as_str(), egui::PointerButton::Primary)),
+            "--right-click-at" => Some((w[1].as_str(), egui::PointerButton::Secondary)),
+            _ => None,
+        })
+        .collect();
+    for (at, button) in clicks {
+        let Some((x, y)) = at.split_once(',').and_then(|(x, y)| Some((x.parse::<f32>().ok()?, y.parse::<f32>().ok()?))) else {
             continue;
         };
         let pos = egui::pos2(x, y);
@@ -133,6 +174,11 @@ fn main() {
         harness.step();
         harness.event(egui::Event::PointerButton { pos, button, pressed: false, modifiers: egui::Modifiers::NONE });
         harness.run_steps(4);
+        // `--click-wait-ms N`: keep rendering N ms after each click (background jobs finishing).
+        let t_wait = std::time::Instant::now();
+        while t_wait.elapsed() < std::time::Duration::from_millis(click_wait_ms) {
+            harness.step();
+        }
     }
     let t_settle = std::time::Instant::now();
     while t_settle.elapsed() < std::time::Duration::from_millis(settle_ms) {

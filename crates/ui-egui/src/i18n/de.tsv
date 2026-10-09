@@ -2368,3 +2368,5 @@ fontWeight	Italic	Kursiv
 @plural	{n} style|{n} styles	{n} Stil|{n} Stile
 @plural	{n} text layer|{n} text layers	{n} Textebene|{n} Textebenen
 @plural	{n} open document|{n} open documents	{n} geöffnetem Dokument|{n} geöffneten Dokumenten
+	Downloading missing fonts	Fehlende Schriften werden heruntergeladen
+	Loading Google Fonts	Google Fonts wird geladen

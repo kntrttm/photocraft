@@ -69,10 +69,9 @@ impl Fam {
         if self.real {
             font_named(self.name)
         } else {
-            // Not a real download: distinct bytes per file, the right size for the demo.
-            let mut b = font_named("Zzzzz");
-            b.push(i as u8);
-            b
+            // Not a family the tests install by name, but a valid font all the same.
+            let _ = i;
+            font_named("Zzzzz")
         }
     }
 }

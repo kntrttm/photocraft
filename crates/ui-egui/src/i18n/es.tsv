@@ -2398,3 +2398,5 @@ fontWeight	Italic	Cursiva
 @plural	{n} style|{n} styles	{n} estilo|{n} estilos
 @plural	{n} text layer|{n} text layers	{n} capa de texto|{n} capas de texto
 @plural	{n} open document|{n} open documents	{n} documento abierto|{n} documentos abiertos
+	Downloading missing fonts	Descargando las fuentes que faltan
+	Loading Google Fonts	Cargando Google Fonts

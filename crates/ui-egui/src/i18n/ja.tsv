@@ -3356,3 +3356,5 @@ fontWeight	Italic	斜体
 @plural	{n} style|{n} styles	{n} スタイル
 @plural	{n} text layer|{n} text layers	{n} 個のテキストレイヤー
 @plural	{n} open document|{n} open documents	開いている {n} 個のドキュメント
+	Downloading missing fonts	不足しているフォントをダウンロード中
+	Loading Google Fonts	Google Fonts を読み込み中

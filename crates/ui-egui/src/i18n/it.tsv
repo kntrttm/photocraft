@@ -2399,3 +2399,5 @@ fontWeight	Italic	Corsivo
 @plural	{n} style|{n} styles	{n} stile|{n} stili
 @plural	{n} text layer|{n} text layers	{n} livello di testo|{n} livelli di testo
 @plural	{n} open document|{n} open documents	{n} documento aperto|{n} documenti aperti
+	Downloading missing fonts	Download dei font mancanti
+	Loading Google Fonts	Caricamento di Google Fonts

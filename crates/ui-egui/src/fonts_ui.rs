@@ -32,6 +32,10 @@ use crate::theme::Tokens;
 const PAGE: u64 = 100;
 /// The picker's width while Find More is showing.
 const WIDTH: f32 = 380.0;
+/// The height of the family list.
+const LIST_HEIGHT: f32 = 270.0;
+/// The tab strip, search field and filters above the list.
+const HEADER_HEIGHT: f32 = 112.0;
 
 /// The font picker's tabs.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -166,6 +170,12 @@ fn named(resp: egui::Response, label: &str) -> egui::Response {
     let enabled = resp.enabled();
     resp.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, enabled, label));
     resp
+}
+
+/// The start of a long error text (the whole text is the tooltip).
+fn short(msg: &str) -> String {
+    const MAX: usize = 150;
+    if msg.chars().count() <= MAX { msg.to_string() } else { format!("{}…", msg.chars().take(MAX).collect::<String>().trim_end()) }
 }
 
 /// "12.3 MB" / "840 KB".
@@ -402,6 +412,8 @@ pub fn find_more(app: &mut PhotocraftApp, ui: &mut egui::Ui, current: &str) -> O
     let t = Tokens::get(ui.ctx());
     ui.set_min_width(WIDTH);
     ui.set_max_width(WIDTH);
+    // Popups lay text out on one line; the cards and notes here wrap.
+    ui.style_mut().wrap_mode = Some(egui::TextWrapMode::Wrap);
     if !available(app) {
         card(ui, &t, |ui| {
             ui.label(RichText::new(tl!("Online fonts are not available in this build.")).color(t.text_dim));
@@ -414,6 +426,8 @@ pub fn find_more(app: &mut PhotocraftApp, ui: &mut egui::Ui, current: &str) -> O
     }
     // Nothing is requested before the consent above.
     sync_catalog(app);
+    // The same height whatever the list holds (loading, few rows, many).
+    ui.set_min_height(HEADER_HEIGHT + LIST_HEIGHT);
     let mut picked = None;
     let mut f = app.ui.fonts.clone();
     let hint = tl!("Search Google Fonts");
@@ -438,20 +452,27 @@ pub fn find_more(app: &mut PhotocraftApp, ui: &mut egui::Ui, current: &str) -> O
         return None;
     }
     if app.ui.fonts.requested.is_none() || (app.ui.fonts.catalog_job.is_some() && app.ui.fonts.results.is_empty()) {
-        ui.label(RichText::new(tl!("Loading Google Fonts…")).color(t.text_dim));
+        // As tall as the list will be, so the popup does not jump when the rows arrive.
+        ui.allocate_ui(vec2(ui.available_width(), LIST_HEIGHT), |ui| {
+            ui.label(RichText::new(tl!("Loading Google Fonts…")).color(t.text_dim));
+        });
         return None;
     }
     if app.ui.fonts.results.is_empty() {
         ui.label(RichText::new(tl!("No fonts found")).color(t.text_dim));
         return None;
     }
-    egui::ScrollArea::vertical().max_height(300.0).id_salt("gf-list").auto_shrink([false, true]).show(ui, |ui| {
-        let rows = app.ui.fonts.results.clone();
-        for e in &rows {
-            if let Some(p) = row(app, ui, &t, e, current) {
-                picked = Some(p);
+    // A fixed-size frame: the popup's own scroll area sizes itself from the previous frame, and a
+    // list that follows the available height would never grow past the first frame's.
+    ui.allocate_ui(vec2(ui.available_width(), LIST_HEIGHT), |ui| {
+        egui::ScrollArea::vertical().max_height(LIST_HEIGHT).id_salt("gf-list").auto_shrink([false, true]).show(ui, |ui| {
+            let rows = app.ui.fonts.results.clone();
+            for e in &rows {
+                if let Some(p) = row(app, ui, &t, e, current) {
+                    picked = Some(p);
+                }
             }
-        }
+        });
     });
     let (shown, total) = (app.ui.fonts.results.len() as u64, app.ui.fonts.total);
     if total > shown {
@@ -474,7 +495,7 @@ fn consent(app: &mut PhotocraftApp, ui: &mut egui::Ui, t: &Tokens) {
                 .size(12.5),
         );
         ui.add_space(10.0);
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
             allow_it = crate::widgets::primary_button(ui, tl!("Allow"), 84.0).clicked();
             not_now = crate::widgets::secondary_button(ui, tl!("Not now"), 84.0).clicked();
         });
@@ -497,7 +518,7 @@ fn error_card(app: &mut PhotocraftApp, ui: &mut egui::Ui, t: &Tokens, err: &str)
             ui.add_space(4.0);
             ui.label(RichText::new(err).color(t.text_dim).size(12.0));
             ui.add_space(8.0);
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
                 retry = crate::widgets::secondary_button(ui, tl!("Retry"), 84.0).clicked();
             });
         }
@@ -518,7 +539,10 @@ fn row(app: &mut PhotocraftApp, ui: &mut egui::Ui, t: &Tokens, e: &Entry, curren
         ui.vertical(|ui| {
             ui.set_width((ui.available_width() - right).max(120.0));
             if usable {
-                if ui.selectable_label(e.family.eq_ignore_ascii_case(current), RichText::new(&e.family).font(crate::theme::medium(13.0))).clicked() {
+                // An installed family is a normal font now: click to use it.
+                let on = e.family.eq_ignore_ascii_case(current);
+                let name = RichText::new(&e.family).font(crate::theme::medium(13.0)).color(if on { t.accent } else { t.text });
+                if ui.add(egui::Label::new(name).sense(Sense::click())).on_hover_cursor(egui::CursorIcon::PointingHand).clicked() {
                     picked = Some(e.family.clone());
                 }
             } else {
@@ -535,7 +559,7 @@ fn row(app: &mut PhotocraftApp, ui: &mut egui::Ui, t: &Tokens, e: &Entry, curren
             }
             if let Some(n) = app.ui.fonts.notes.get(&e.family) {
                 let color = if n.error { t.danger } else { t.text_dim };
-                ui.label(RichText::new(&n.message).color(color).size(11.5));
+                ui.label(RichText::new(short(&n.message)).color(color).size(11.5)).on_hover_text(&n.message);
             }
         });
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
@@ -550,7 +574,7 @@ fn row(app: &mut PhotocraftApp, ui: &mut egui::Ui, t: &Tokens, e: &Entry, curren
                 let (r, resp) = ui.allocate_exact_size(vec2(24.0, 24.0), Sense::hover());
                 crate::icons::paint(ui, r, "check", 14.0, t.accent);
                 named(resp, tl!("Installed")).on_hover_text(tl!("Installed"));
-            } else if named(crate::icons::button(ui, "cloud", 24.0, false, "Download from Google Fonts"), tl!("Download from Google Fonts")).clicked() {
+            } else if named(crate::icons::button(ui, "cloud", 28.0, false, "Download from Google Fonts"), tl!("Download from Google Fonts")).clicked() {
                 install(app, &e.family);
             }
         });
@@ -573,6 +597,11 @@ fn kind_of(fields: &Map<String, Value>) -> &str {
 /// Is this one of this module's dialogs?
 pub fn owns(fields: &Map<String, Value>) -> bool {
     matches!(kind_of(fields), MANAGE | MISSING)
+}
+
+/// Is this the Manage downloaded fonts dialog (which has a Close button only)?
+pub fn is_manage(fields: &Map<String, Value>) -> bool {
+    kind_of(fields) == MANAGE
 }
 
 /// Preferences › Type › Manage downloaded fonts…
@@ -646,7 +675,7 @@ fn manage_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut Map<String, V
             );
             ui.label(RichText::new(text).color(t.warning).size(12.5));
             ui.add_space(8.0);
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
                 if crate::widgets::primary_button(ui, tl!("Remove anyway"), 110.0).clicked() {
                     remove = Some((family.clone(), true));
                 }
@@ -764,30 +793,29 @@ fn missing_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut Map<String, 
     } else {
         ui.label(RichText::new(tl!("These fonts are not installed:")).color(t.text_dim));
         ui.add_space(6.0);
-        egui::ScrollArea::vertical().max_height(240.0).id_salt("gf-missing").show(ui, |ui| {
-            egui::Grid::new("gf-missing-grid").num_columns(2).spacing([14.0, 8.0]).show(ui, |ui| {
-                for m in &missing {
+        egui::ScrollArea::vertical().max_height(240.0).id_salt("gf-missing").auto_shrink([false, true]).show(ui, |ui| {
+            for m in &missing {
+                ui.horizontal(|ui| {
                     ui.vertical(|ui| {
-                        ui.label(RichText::new(m).font(crate::theme::medium(13.0)).color(t.text));
+                        ui.set_width(210.0);
+                        ui.add(egui::Label::new(RichText::new(m).font(crate::theme::medium(13.0)).color(t.text)).truncate());
                         if downloadable.contains(m) {
-                            ui.label(RichText::new(tl!("Available on Google Fonts")).color(t.accent_text).size(11.0));
+                            ui.label(RichText::new(tl!("Available on Google Fonts")).color(t.accent).size(11.0));
                         }
                     });
                     let cur = map.get(m).and_then(Value::as_str).unwrap_or("").to_string();
                     let shown = if cur.is_empty() { tl!("Don't replace").to_string() } else { cur.clone() };
                     let mut chosen = cur.clone();
-                    ui.horizontal(|ui| {
-                        ui.label(RichText::new(tl!("Replace with")).color(t.text_faint).size(11.5));
-                        egui::ComboBox::from_id_salt(("gf-replace", m)).selected_text(shown).width(170.0).height(320.0).icon(crate::widgets::chevron_icon).show_ui(ui, |ui| {
-                            if ui.selectable_label(chosen.is_empty(), tl!("Don't replace")).clicked() {
-                                chosen.clear();
+                    ui.label(RichText::new(tl!("Replace with")).color(t.text_faint).size(11.5));
+                    egui::ComboBox::from_id_salt(("gf-replace", m)).selected_text(shown).width(160.0).height(320.0).icon(crate::widgets::chevron_icon).show_ui(ui, |ui| {
+                        if ui.selectable_label(chosen.is_empty(), tl!("Don't replace")).clicked() {
+                            chosen.clear();
+                        }
+                        for fam in crate::type_tool::families().iter() {
+                            if ui.selectable_label(*fam == chosen, fam).clicked() {
+                                chosen = fam.clone();
                             }
-                            for fam in crate::type_tool::families().iter() {
-                                if ui.selectable_label(*fam == chosen, fam).clicked() {
-                                    chosen = fam.clone();
-                                }
-                            }
-                        });
+                        }
                     });
                     if chosen != cur {
                         if chosen.is_empty() {
@@ -796,9 +824,9 @@ fn missing_body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut Map<String, 
                             map.insert(m.clone(), json!(chosen));
                         }
                     }
-                    ui.end_row();
-                }
-            });
+                });
+                ui.add_space(6.0);
+            }
         });
         download_row(app, ui, &t, f, !downloadable.is_empty());
     }

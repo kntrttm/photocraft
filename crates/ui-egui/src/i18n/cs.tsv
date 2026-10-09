@@ -2329,3 +2329,5 @@ fontWeight	Italic	Kurzíva
 @plural	{n} style|{n} styles	{n} styl|{n} styly|{n} stylů
 @plural	{n} text layer|{n} text layers	{n} textová vrstva|{n} textové vrstvy|{n} textových vrstev
 @plural	{n} open document|{n} open documents	{n} otevřený dokument|{n} otevřené dokumenty|{n} otevřených dokumentů
+	Downloading missing fonts	Stahování chybějících písem
+	Loading Google Fonts	Načítání Google Fonts

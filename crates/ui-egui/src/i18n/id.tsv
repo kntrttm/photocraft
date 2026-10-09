@@ -2739,3 +2739,5 @@ fontWeight	Italic	Miring
 @plural	{n} style|{n} styles	{n} gaya
 @plural	{n} text layer|{n} text layers	{n} lapisan teks
 @plural	{n} open document|{n} open documents	{n} dokumen terbuka
+	Downloading missing fonts	Mengunduh font yang hilang
+	Loading Google Fonts	Memuat Google Fonts

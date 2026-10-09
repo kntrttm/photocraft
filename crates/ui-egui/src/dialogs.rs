@@ -233,8 +233,10 @@ pub fn show(app: &mut PhotocraftApp, ctx: &egui::Context) {
                 // (larger) size, so a dialog whose body gets shorter would never shrink back.
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Min), |ui| {
                     ui.spacing_mut().item_spacing.x = 10.0;
-                    if matches!(d.kind, DialogKind::About | DialogKind::Error) {
-                        if dialog_buttons(ui, &[DialogButton::new(ButtonRole::Default, tl!("OK"), 84.0)]).is_some() {
+                    if matches!(d.kind, DialogKind::About | DialogKind::Error) || crate::fonts_ui::is_manage(&d.fields) {
+                        // Manage downloaded fonts acts as you click; it has nothing to confirm.
+                        let label = if crate::fonts_ui::is_manage(&d.fields) { tl!("Close") } else { tl!("OK") };
+                        if dialog_buttons(ui, &[DialogButton::new(ButtonRole::Default, label, 84.0)]).is_some() {
                             outcome = Some(false);
                         }
                     } else {
