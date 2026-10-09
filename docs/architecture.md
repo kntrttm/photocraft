@@ -113,6 +113,7 @@ photocraft/
 │  ├─ platform/                photocraft-platform  traits: file dialogs, clipboard, fonts, tablet input, menus, storage; native + web impls
 │  ├─ ui-egui/                 photocraft-ui-egui   the (first) GUI shell: panels, dialogs, canvas widget, theme
 │  ├─ automation/              photocraft-automation  MCP server (rmcp) + JSON-RPC over the command registry
+│  ├─ fontfetch/               photocraft-fontfetch  Google Fonts downloads: ureq/rustls fetcher + app-private font store, injected into the engine (native only; wasm gets the index constants)
 │  └─ testkit/                 photocraft-testkit   golden images, perceptual diff, fixtures, PSD corpus helpers
 ├─ apps/
 │  ├─ photocraft/              desktop binary (winit + wgpu + ui-egui + platform-native)
@@ -137,7 +138,7 @@ photocraft/
 
 ```text
  L7  apps/*                         (binaries: wire everything together)
- L6  ui-egui · automation · platform
+ L6  ui-egui · automation · fontfetch · platform
  L5  engine
  L4  tools · viewport · io · ml · plugins
  L3  compose · gpu · format

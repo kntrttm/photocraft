@@ -20,10 +20,10 @@ USAGE:
       --quality sets the JPEG or WebP quality; a WebP written with a quality is lossy, without one lossless.
   photocraft-cli info <file> [--compact]
       Print the document as JSON (size, mode, depth, layer tree).
-  photocraft-cli run (<file> | --new <json>) --cmd <id> [--params <json>] [--cmd …] [--out <file>] [--format <ext>] [--quality <1-100>] [--tiff-layers]
+  photocraft-cli run (<file> | --new <json>) --cmd <id> [--params <json>] [--cmd …] [--out <file>] [--format <ext>] [--quality <1-100>] [--tiff-layers] [--allow-online-fonts]
       Open a file, run engine commands in order, save the result. Each --params
       applies to the preceding --cmd. Prints each command's JSON result.
-  photocraft-cli batch --actions <actions.json> --in <dir> --out <dir> [--format <ext>] [--quality <1-100>] [--in-place] [--tiff-layers]
+  photocraft-cli batch --actions <actions.json> --in <dir> --out <dir> [--format <ext>] [--quality <1-100>] [--in-place] [--tiff-layers] [--allow-online-fonts]
       Apply an action list to every image in a directory. Steps are [id, params] pairs,
       {\"command\": id, \"params\": {…}} objects or bare ids, as a recorded action or droplet stores them
       (a list, or wrapped in {\"actions\": …}, {\"steps\": …} or a droplet). An --out folder that is the
@@ -33,14 +33,18 @@ USAGE:
   photocraft-cli commands [--json] [--filter <text>]
       List the engine command registry.
   photocraft-cli mcp [--bridge <127.0.0.1:port>] [--control-token <64-hex> | --control-token-file <path>]
-      [--automation-read-root <dir>] [--automation-write-root <dir>]
+      [--automation-read-root <dir>] [--automation-write-root <dir>] [--allow-online-fonts]
       Run the MCP server on stdio (headless engine, or bridge to a running `photocraft --control <port>`).
   photocraft-cli serve [--port <port>] [--control-token <64-hex> | --control-token-file <path>]
-      [--automation-read-root <dir>] [--automation-write-root <dir>]
+      [--automation-read-root <dir>] [--automation-write-root <dir>] [--allow-online-fonts]
       Keep one headless session open and answer JSON lines ({\"id\",\"method\",\"params\"}) on stdio,
       or on 127.0.0.1:<port>. Methods: engine.execute, jobs.list/cancel, engine.commands,
       doc.open/new/save/inspect/render/select/close, session.list, batch, methods
       (docs/control-protocol.md#headless-server).
+
+  --allow-online-fonts (run, batch, mcp, serve): allow downloading fonts from Google Fonts (jsDelivr
+  and GitHub) in this process only; nothing is saved, and MCP/control clients cannot change it.
+  Without it downloads stay off. Not used with `mcp --bridge`: the running app's own preference decides.
 
   photocraft-cli <subcommand> --help (or -h) prints this text. A flag the subcommand doesn't take is
   an error.
@@ -60,23 +64,26 @@ struct Subcommand {
     run: fn(&Args, &mut dyn Write, &mut dyn Write) -> R,
 }
 
+/// Host-level opt-in to downloading fonts (see [`with_fonts`]).
+const ALLOW_FONTS: &str = "--allow-online-fonts";
+
 const SUBCOMMANDS: &[Subcommand] = &[
     Subcommand { name: "convert", values: &["--format", "--quality"], bare: &["--tiff-layers"], run: convert },
     Subcommand { name: "info", values: &[], bare: &["--compact"], run: |a, out, _| info(a, out) },
-    Subcommand { name: "run", values: &["--new", "--cmd", "--params", "--out", "--format", "--quality"], bare: &["--tiff-layers"], run: run_cmds },
-    Subcommand { name: "batch", values: &["--actions", "--in", "--out", "--format", "--quality"], bare: &["--in-place", "--tiff-layers"], run: batch },
+    Subcommand { name: "run", values: &["--new", "--cmd", "--params", "--out", "--format", "--quality"], bare: &["--tiff-layers", ALLOW_FONTS], run: run_cmds },
+    Subcommand { name: "batch", values: &["--actions", "--in", "--out", "--format", "--quality"], bare: &["--in-place", "--tiff-layers", ALLOW_FONTS], run: batch },
     Subcommand { name: "droplet", values: &["--out"], bare: &[], run: droplet },
     Subcommand { name: "commands", values: &["--filter"], bare: &["--json"], run: |a, out, _| commands(a, out) },
     Subcommand {
         name: "mcp",
         values: &["--bridge", "--control-token", "--control-token-file", "--automation-read-root", "--automation-write-root"],
-        bare: &[],
+        bare: &[ALLOW_FONTS],
         run: |a, _, _| mcp(a),
     },
     Subcommand {
         name: "serve",
         values: &["--port", "--control-token", "--control-token-file", "--automation-read-root", "--automation-write-root"],
-        bare: &[],
+        bare: &[ALLOW_FONTS],
         run: |a, _, err| serve(a, err),
     },
 ];
@@ -126,12 +133,21 @@ impl Args {
 type R = Result<(), String>;
 
 /// Gives a headless session the Google Fonts download services: fonts downloaded earlier are
-/// registered (from disk, no network) and `type.fonts.*` work once Preferences > Type > Allow
-/// Online Fonts is on (a `run` script can set it with `prefs.set`; an untrusted MCP or control
-/// client cannot). Never fatal.
-fn with_fonts(mut h: Headless) -> Headless {
-    if let Some(dir) = photocraft_fontfetch::default_config_dir() {
+/// registered (from disk, no network) and `type.fonts.*` work once `type.allowOnlineFonts` is on.
+/// The CLI never reads or writes the preferences file, so the preference starts off; the person
+/// launching the CLI turns it on for this process with `--allow-online-fonts` (never persisted).
+/// A `run` script can also set it with `prefs.set`; an untrusted MCP or control client cannot
+/// change it at all (the automation guard), with or without the flag. Never fatal.
+fn with_fonts(h: Headless, a: &Args) -> Headless {
+    with_fonts_in(h, a.has(ALLOW_FONTS), photocraft_fontfetch::default_config_dir())
+}
+
+fn with_fonts_in(mut h: Headless, allow_online: bool, config_dir: Option<PathBuf>) -> Headless {
+    if let Some(dir) = config_dir {
         photocraft_fontfetch::attach(&mut h.session, &dir);
+    }
+    if allow_online {
+        h.session.edit_prefs(|p| p.type_.allow_online_fonts = true);
     }
     h
 }
@@ -283,7 +299,7 @@ fn command_list(a: &Args) -> Result<Vec<(String, Value)>, String> {
 
 fn run_cmds(a: &Args, out: &mut dyn Write, err: &mut dyn Write) -> R {
     let opts = export_opts(a)?;
-    let mut h = with_fonts(Headless::trusted_local());
+    let mut h = with_fonts(Headless::trusted_local(), a);
     match (a.positional.as_slice(), a.get("--new")) {
         ([file], None) => {
             let o = h.open(Path::new(file)).map_err(|e| e.to_string())?;
@@ -388,7 +404,7 @@ fn batch(a: &Args, out: &mut dyn Write, err: &mut dyn Write) -> R {
         let target_text = target.to_string_lossy();
         let r = (|| -> Result<Vec<String>, String> {
             written.check(&target_text)?;
-            let mut h = with_fonts(Headless::trusted_local());
+            let mut h = with_fonts(Headless::trusted_local(), a);
             h.open(input).map_err(|e| e.to_string())?;
             for (id, p) in &actions {
                 h.command_run(id, p.clone()).map_err(|e| format!("`{id}`: {e}"))?;
@@ -459,7 +475,7 @@ fn commands(a: &Args, out: &mut dyn Write) -> R {
 
 fn serve(a: &Args, err: &mut dyn Write) -> R {
     use std::sync::{Arc, Mutex};
-    let h = Arc::new(Mutex::new(with_fonts(Headless::with_workspace(automation_workspace(a)?))));
+    let h = Arc::new(Mutex::new(with_fonts(Headless::with_workspace(automation_workspace(a)?), a)));
     match a.get("--port") {
         Some(port) => {
             let port: u16 = port.parse().map_err(|_| format!("bad --port `{port}`"))?;
@@ -490,7 +506,7 @@ fn mcp(a: &Args) -> R {
             let token = security::client_token(supplied.as_deref(), token_file.as_deref()).map_err(|e| e.to_string())?;
             PhotocraftMcp::bridge(addr, &token).map_err(|e| e.to_string())?
         }
-        None => PhotocraftMcp::with_backend(photocraft_automation::Backend::Headless(std::sync::Arc::new(std::sync::Mutex::new(with_fonts(Headless::with_workspace(automation_workspace(a)?)))))),
+        None => PhotocraftMcp::with_backend(photocraft_automation::Backend::Headless(std::sync::Arc::new(std::sync::Mutex::new(with_fonts(Headless::with_workspace(automation_workspace(a)?), a))))),
     };
     let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().map_err(|e| e.to_string())?;
     rt.block_on(server.serve_stdio()).map_err(|e| e.to_string())
@@ -578,5 +594,63 @@ mod missing_font_warning_tests {
         assert_eq!(code, 0, "{stderr}");
         assert!(!stderr.contains("font '"), "{stderr}");
         let _ = std::fs::remove_dir_all(&folder);
+    }
+}
+
+#[cfg(test)]
+mod font_flag_tests {
+    use super::*;
+
+    fn sub(name: &str) -> &'static Subcommand {
+        SUBCOMMANDS.iter().find(|s| s.name == name).expect("subcommand")
+    }
+
+    fn temp(tag: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!("photocraft-cli-fonts-{tag}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).expect("temp dir");
+        d
+    }
+
+    #[test]
+    fn the_flag_is_parsed_by_the_subcommands_that_attach_fonts() {
+        for name in ["run", "batch", "mcp", "serve"] {
+            let a = parse(sub(name), &[ALLOW_FONTS.to_string()]).expect("parses").expect("not help");
+            assert!(a.has(ALLOW_FONTS), "{name}");
+            assert!(!parse(sub(name), &[]).expect("parses").expect("not help").has(ALLOW_FONTS), "{name}");
+            assert!(parse(sub(name), &[format!("{ALLOW_FONTS}=1")]).is_err(), "{name}: takes no value");
+        }
+        for name in ["convert", "info", "droplet", "commands"] {
+            assert!(parse(sub(name), &[ALLOW_FONTS.to_string()]).is_err(), "{name} does not take it");
+        }
+        assert!(USAGE.contains("--allow-online-fonts") && USAGE.contains("Google Fonts"));
+    }
+
+    #[test]
+    fn the_flag_turns_downloads_on_for_this_session_only() {
+        let dir = temp("flag");
+        let prefs = dir.join("preferences.json");
+        std::fs::write(&prefs, b"{\"version\":1}").expect("write prefs");
+        let before = std::fs::read(&prefs).expect("read");
+
+        let mut off = with_fonts_in(Headless::trusted_local(), false, Some(dir.clone()));
+        assert!(!off.session.prefs().type_.allow_online_fonts);
+        let e = off.session.execute("type.fonts.install", json!({"family": "Roboto"})).expect_err("off").to_string();
+        assert!(e.contains("turned off"), "{e}");
+
+        let mut on = with_fonts_in(Headless::trusted_local(), true, Some(dir.clone()));
+        assert!(on.session.prefs().type_.allow_online_fonts);
+        // Past the preference check: this build has no pinned index, so it stops there.
+        let e = on.session.execute("type.fonts.install", json!({"family": "Roboto"})).expect_err("no index").to_string();
+        assert!(!e.contains("turned off") && e.contains("not configured"), "{e}");
+
+        // Nothing was written: the saved preferences are untouched and no new file appeared.
+        assert_eq!(std::fs::read(&prefs).expect("read"), before);
+        let fresh = temp("flag-fresh");
+        let _ = with_fonts_in(Headless::trusted_local(), true, Some(fresh.clone()));
+        assert!(!fresh.join("preferences.json").exists());
+        // A new session without the flag is off again.
+        assert!(!with_fonts_in(Headless::trusted_local(), false, Some(fresh)).session.prefs().type_.allow_online_fonts);
+        let _ = std::fs::remove_dir_all(dir);
     }
 }

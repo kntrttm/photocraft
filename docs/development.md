@@ -60,6 +60,16 @@ CRAFT_FONTS_DIR="$PWD/../craft-fonts" cargo test --workspace     # runs the Japa
 - **Type tool:** the text engine registers them in `FontDb::new` (so also with no system fonts) and puts them first in the Japanese slot of the locale-ordered fallback list: BIZ UDPGothic for sans runs, Shippori Mincho / BIZ UDMincho for serif runs.
 - **Web:** the wasm32 build never embeds craft-fonts, even with `CRAFT_FONTS_DIR` set: measured on 2026-10-06, the UI face alone took the release wasm from 24.19 MB to 28.87 MB, over the 24 MiB gate in `packaging/web/package.sh`. The web build therefore has no Japanese font yet (loading craft-fonts next to the wasm at run time would be the way to add one).
 - **Google Fonts index:** `cargo xtask fonts-index --repo <google/fonts checkout> --out <file> [--commit <sha>]` walks `{ofl,apache,ufl}/*/METADATA.pb` and writes the JSON index (schema 1; format documented in `crates/text/src/catalog.rs`) that `photocraft_text::catalog::Catalog::parse` validates and searches. It hashes the font files and reads axes and PostScript names (including `fvar` named instances) with skrifa. Treat the checkout as untrusted data: pass it only as `--repo`, never run anything from inside it. Nothing is downloaded by this command.
+- **Try Google Fonts downloads locally:** the pinned index does not exist yet (`INDEX_URLS` in `crates/fontfetch/src/lib.rs` is empty), so point the app at a local one. Build an index from a `google/fonts` checkout (a few families are enough), then launch with it and turn the preference on:
+
+  ```sh
+  cargo xtask fonts-index --repo ../google-fonts --out /tmp/gf-index.json
+  PHOTOCRAFT_FONT_INDEX_FILE=/tmp/gf-index.json PHOTOCRAFT_CONFIG_DIR=/tmp/pc-config cargo run -p photocraft
+  # Edit > Preferences > Type > "Allow online fonts" (or: prefs.set {"values": {"type.allowOnlineFonts": true}} from the control channel's own user, not an MCP client)
+  # then: type.fonts.catalog {"query": "noto"}, type.fonts.install {"family": "Noto Sans JP"}, type.fonts.installed, type.fonts.remove
+  ```
+
+  Downloaded fonts live in `<config dir>/Fonts/Google/<slug>/` (never the OS font folders) and are registered from disk at the next start, with no network. The override file is still fully validated, and the font files are still fetched (jsDelivr, then raw.githubusercontent.com) and checked against the index's size and sha256. Headless: `photocraft-cli run ... --allow-online-fonts` (also `batch`, `mcp`, `serve`) turns the preference on for that process only; nothing is saved, and the CLI never reads or writes the preferences file. Automation clients (MCP, the control channel, `serve`) cannot enable the preference themselves: `prefs.set` of `type.allowOnlineFonts` (or of the whole `type` section) is refused for them, so only the person who runs the app or the CLI can opt in.
 - Tests that need the fonts skip with a message when `CRAFT_FONTS` is empty; CI's Linux job runs the tests a second time with `CRAFT_FONTS_DIR` set. Desktop releases check out craft-fonts at the commit pinned in `.github/workflows/release.yml` (`CRAFT_FONTS_REF`; ci.yml pins the same commit) and ship each font's `OFL.txt` as `OFL-<family>.txt`.
 
 ## Graphics startup and device loss

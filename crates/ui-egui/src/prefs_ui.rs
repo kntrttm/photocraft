@@ -1847,8 +1847,11 @@ mod tests {
         let values = prefs::Preferences::default().to_json();
         assert!(has_visible_fields(&values, "general"));
         assert!(has_visible_fields(&values, "fileHandling"));
+        // Type has one implemented setting (Allow Online Fonts); the rest stay hidden.
+        assert!(has_visible_fields(&values, "type"));
+        assert!(!prefs::is_hidden("type.allowOnlineFonts") && prefs::is_hidden("type.smartQuotes"));
         // Every setting of these sections is still unimplemented.
-        for section in ["type", "integrations", "scratchDisks"] {
+        for section in ["integrations", "scratchDisks"] {
             assert!(!has_visible_fields(&values, section), "{section}");
         }
         // Rotate View with Trackpad is live; the other Enhanced Controls rows stay hidden.

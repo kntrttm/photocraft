@@ -29,7 +29,7 @@ crates/
   compose gpu format         L3 CPU compositor (the oracle), wgpu compositor, .pcraft native format
   io plugins                 L4 document <-> PSD / flat formats; sandboxed WebAssembly plug-ins
   engine                     L5 Session + command registry (every action is a command)
-  ui-egui automation         L6 egui shell (thin: all actions go through the engine); MCP server
+  ui-egui automation fontfetch  L6 egui shell (thin: all actions go through the engine); MCP server; Google Fonts HTTPS fetcher + font store
   testkit                    test helpers
 apps/
   photocraft                 desktop app (eframe/wgpu), TCP control server
