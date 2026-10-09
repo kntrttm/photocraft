@@ -605,7 +605,7 @@ fn installed(s: &mut Session, _: &Value) -> Result<Value> {
 }
 
 /// `(layers, documents)` among the open documents that use `family` in a text run.
-fn usage(s: &Session, family: &str) -> (usize, usize) {
+pub fn usage(s: &Session, family: &str) -> (usize, usize) {
     let (mut layers, mut docs) = (0, 0);
     for st in s.documents() {
         let mut here = 0;

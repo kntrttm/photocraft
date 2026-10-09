@@ -60,6 +60,7 @@ pub mod file_dialog;
 pub mod file_open;
 pub mod file_ui;
 pub mod fill_ui;
+pub mod fonts_ui;
 pub mod filter_dialog;
 #[cfg(not(target_arch = "wasm32"))]
 mod filter_preview_worker;

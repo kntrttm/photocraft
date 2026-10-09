@@ -148,6 +148,10 @@ pub(crate) fn invoke_unguarded(app: &mut PhotocraftApp, ctx: &egui::Context, id:
     if let Some(r) = crate::preset_panels::menu(app, id, &params) {
         return r;
     }
+    // Type › Resolve Missing Fonts (with Google Fonts downloads).
+    if let Some(r) = crate::fonts_ui::invoke(app, id, &params) {
+        return r;
+    }
     // Character/Paragraph Styles, Glyphs, Edit › Check Spelling dialog.
     if let Some(r) = crate::type_panels_ui::menu(app, id, &params) {
         return r;

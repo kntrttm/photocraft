@@ -168,6 +168,10 @@ fn on_event(app: &mut PhotocraftApp, e: JobEvent) {
         }
         return;
     }
+    // Google Fonts downloads show on their rows and in their dialogs (see `fonts_ui`).
+    if crate::fonts_ui::on_job(app, &e) {
+        return;
+    }
     match e.outcome {
         JobOutcome::Done(v) if e.command == "brush.presets.importAbr" => {
             let n = v.get("count").and_then(Value::as_u64).unwrap_or(0);

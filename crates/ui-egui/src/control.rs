@@ -8,7 +8,7 @@
 //! - `engine.commands`: list commands with enablement
 //! - `ui.inspect`: full UI state (tool, panels, views, dialogs, windows, window size); the menu
 //!   tree is `ui.menu.list`
-//! - `ui.set {tool?, panels?, dock?, dockTabs?, dockWidth?, colorPanel?, maskTarget?, vectorMaskTarget?, selectionMode?, zoom?, center?, rotation?, fit?, theme?, brushSection?, brushTab?, brushesView?, brushPicker?, brushPickerView?, brushSize?}`:
+//! - `ui.set {tool?, panels?, dock?, dockTabs?, dockWidth?, colorPanel?, maskTarget?, vectorMaskTarget?, selectionMode?, zoom?, center?, rotation?, fit?, theme?, brushSection?, brushTab?, brushesView?, brushPicker?, brushPickerView?, brushSize?, fonts?}`:
 //!   change UI state; any other field is an error ([`UI_SET_FIELDS`])
 //! - `ui.dialog.open {kind, fields?}` (kinds: newDocument, about, layerStyle {effect?}, colorPicker {target: foreground|background}, command {command}) / `ui.dialog.set {dialog, field, value}` / `ui.dialog.confirm {dialog, wait?}` / `ui.dialog.cancel {dialog}`
 //! - `ui.dialog.apply {dialog}`: commit Preferences changes without closing the dialog
@@ -74,7 +74,7 @@ pub enum Outcome {
 /// field's value is validated before the first one is applied, so a typo, an unknown field, a
 /// bad value or a bad nested key can't reply with success while nothing — or only half of it —
 /// changed (#412).
-pub const UI_SET_FIELDS: [&str; 25] = [
+pub const UI_SET_FIELDS: [&str; 26] = [
     "tool",
     "panels",
     "dock",
@@ -100,6 +100,7 @@ pub const UI_SET_FIELDS: [&str; 25] = [
     "eyedropperSampleSize",
     "eyedropperSample",
     "eyedropperRing",
+    "fonts",
 ];
 
 /// Most clicks one `ui.click` may queue (#982). Each click is a press and a release that the app
@@ -497,6 +498,9 @@ fn dispatch(app: &mut PhotocraftApp, ctx: &egui::Context, req: &ControlRequest) 
                 if let Some(size) = brush_size {
                     app.run("tools.setBrush", json!({"brush": {"size": size}})).map_err(|e| e.to_string())?;
                 }
+                if let Some(v) = p.get("fonts") {
+                    crate::fonts_ui::set(app, v).map_err(|e| e.to_string())?;
+                }
                 Ok(Value::Null)
             })();
             wrap(applied)
@@ -796,6 +800,7 @@ pub fn inspect(app: &PhotocraftApp, ctx: &egui::Context) -> Value {
         "magnetic": app.ui.magnetic,
         "textEdit": app.ui.text_edit,
         "typeTransform": app.ui.type_transform,
+        "fonts": app.ui.fonts,
         "layerMenu": app.ui.layer_menu,
         "brushPicker": app.ui.brush_picker.map(|pos| json!({
             "pos": pos,

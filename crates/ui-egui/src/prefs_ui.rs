@@ -663,6 +663,11 @@ fn open_kind(app: &mut PhotocraftApp, kind: &str, label: &str, fields: Value) ->
     app.ui.open_dialog(DialogKind::Command, f)
 }
 
+/// Open one of the dialogs this module renders (also for `fonts_ui`).
+pub fn open_dialog(app: &mut PhotocraftApp, kind: &str, label: &str, fields: Value) -> u64 {
+    open_kind(app, kind, label, fields)
+}
+
 /// Is this a dialog rendered by this module?
 pub fn owns(fields: &Map<String, Value>) -> bool {
     fields.contains_key("__prefsui")
@@ -704,6 +709,7 @@ pub fn width(fields: &Map<String, Value>) -> Option<f32> {
     match fields.get("__prefsui").and_then(Value::as_str)? {
         "prefs" => Some(780.0),
         "shortcuts" => Some(720.0),
+        "fontsManage" | "fontsMissing" => Some(520.0),
         _ => Some(460.0),
     }
 }
@@ -782,8 +788,13 @@ pub fn body(app: &mut PhotocraftApp, ui: &mut egui::Ui, f: &mut Map<String, Valu
     match f.get("__prefsui").and_then(Value::as_str).unwrap_or("") {
         "prefs" => {
             f.insert("__gpuInfo".into(), json!(app.perf.gpu_info.lines()));
+            f.insert("__fonts".into(), json!(crate::fonts_ui::available(app)));
             prefs_body(ui, f);
+            if f.remove("__manageFonts").is_some() {
+                crate::fonts_ui::open_manage(app);
+            }
         }
+        "fontsManage" | "fontsMissing" => crate::fonts_ui::body(app, ui, f),
         "shortcuts" => shortcuts_body(app, ui, f),
         "presets" => presets_body(app, ui, f),
         "presetsIO" => presets_io_body(ui, f),
@@ -862,6 +873,7 @@ fn prefs_body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
     let mut values = f.get("values").cloned().unwrap_or(Value::Null);
     // The dialog follows the language being edited, so a change shows before OK.
     let lang = crate::i18n::Lang::from_pref(values.pointer("/interface/language").and_then(Value::as_str).unwrap_or("auto"));
+    let mut manage_fonts = false;
     ui.horizontal_top(|ui| {
         // Section list.
         ui.vertical(|ui| {
@@ -912,6 +924,10 @@ fn prefs_body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
                     if section == "performance" {
                         gpu_status_rows(ui, f.get("__gpuInfo"), obj);
                     }
+                    if section == "type" && f.get("__fonts").and_then(Value::as_bool) == Some(true) {
+                        ui.add_space(8.0);
+                        manage_fonts = crate::widgets::secondary_button(ui, tl!("Manage downloaded fonts…"), 220.0).clicked();
+                    }
                     ui.add_space(8.0);
                 }
                 if has_visible_fields(&values, &section)
@@ -925,6 +941,9 @@ fn prefs_body(ui: &mut egui::Ui, f: &mut Map<String, Value>) {
     });
     f.insert("section".into(), json!(section));
     f.insert("values".into(), values);
+    if manage_fonts {
+        f.insert("__manageFonts".into(), json!(true));
+    }
 }
 
 /// Preferences › Performance: what the app renders with now, and a reset of the GPU backend
@@ -1473,6 +1492,7 @@ pub fn confirm(app: &mut PhotocraftApp, f: &Map<String, Value>) -> Result<Value,
                 })
             }
         }
+        "fontsManage" | "fontsMissing" => crate::fonts_ui::confirm(app, f),
         "mismatch" => {
             let action = f.get("action").and_then(Value::as_str).unwrap_or("preserve");
             let applied = f.get("applied").and_then(Value::as_str).unwrap_or("preserve");

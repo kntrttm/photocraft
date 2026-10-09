@@ -676,10 +676,17 @@ pub fn draw_overlay(app: &mut PhotocraftApp, painter: &egui::Painter, xf: &ViewX
     }
 }
 
-/// Font families (bundled + system), cached for the process.
-pub fn families() -> &'static [String] {
-    static FAMILIES: std::sync::OnceLock<Vec<String>> = std::sync::OnceLock::new();
-    FAMILIES.get_or_init(|| photocraft_text::shared().lock().map(|mut e| e.fonts.families()).unwrap_or_default())
+static FAMILIES: std::sync::Mutex<Option<std::sync::Arc<Vec<String>>>> = std::sync::Mutex::new(None);
+
+/// Font families (bundled + system + downloaded), cached until [`invalidate_families`].
+pub fn families() -> std::sync::Arc<Vec<String>> {
+    let mut cache = FAMILIES.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    cache.get_or_insert_with(|| std::sync::Arc::new(photocraft_text::shared().lock().map(|mut e| e.fonts.families()).unwrap_or_default())).clone()
+}
+
+/// Forget the cached family list: a font was downloaded or removed.
+pub fn invalidate_families() {
+    *FAMILIES.lock().unwrap_or_else(std::sync::PoisonError::into_inner) = None;
 }
 
 fn weight_name(w: f32) -> &'static str {
@@ -725,15 +732,37 @@ pub fn style_label(style: &str) -> String {
 }
 
 /// Searchable font-family combo box.
-fn font_picker(ui: &mut egui::Ui, current: &mut String, width: f32) -> bool {
-    font_picker_in(ui, current, width, families())
+fn font_picker(app: &mut PhotocraftApp, ui: &mut egui::Ui, current: &mut String, width: f32) -> bool {
+    let list = families();
+    // The Find More tab replaces the family list; picking a font there closes the menu.
+    let mut top = |ui: &mut egui::Ui, current: &mut String| -> Option<bool> {
+        crate::fonts_ui::tabs(app, ui);
+        if app.ui.fonts.tab != crate::fonts_ui::PickerTab::FindMore {
+            return None;
+        }
+        let mut changed = false;
+        if let Some(f) = crate::fonts_ui::find_more(app, ui, current) {
+            *current = f;
+            changed = true;
+            ui.close();
+        }
+        Some(changed)
+    };
+    font_picker_with(ui, current, width, &list, &mut top)
 }
 
 /// Maximum height of the font menu.
 const FONT_MENU_HEIGHT: f32 = 460.0;
 
 /// [`font_picker`] over a given family list (tests pass their own).
+#[cfg(test)]
 fn font_picker_in(ui: &mut egui::Ui, current: &mut String, width: f32, families: &[String]) -> bool {
+    font_picker_with(ui, current, width, families, &mut |_, _| None)
+}
+
+/// [`font_picker_in`] with a hook run first inside the menu: `Some(changed)` means the hook drew
+/// the whole menu (the Find More tab) and the family list is skipped.
+fn font_picker_with(ui: &mut egui::Ui, current: &mut String, width: f32, families: &[String], top: &mut dyn FnMut(&mut egui::Ui, &mut String) -> Option<bool>) -> bool {
     let mut changed = false;
     let search_id = ui.id().with("font-search");
     let combo = egui::ComboBox::from_id_salt("type-font")
@@ -745,6 +774,10 @@ fn font_picker_in(ui: &mut egui::Ui, current: &mut String, width: f32, families:
         // picking a font closes it explicitly below.
         .close_behavior(egui::PopupCloseBehavior::CloseOnClickOutside);
     combo.show_ui(ui, |ui| {
+        if let Some(c) = top(ui, current) {
+            changed = c;
+            return;
+        }
         let (pass_id, focus_id, height_id) = (search_id.with("pass"), search_id.with("focus"), search_id.with("height"));
         let pass = ui.ctx().cumulative_pass_nr();
         let last_pass: Option<u64> = ui.data(|d| d.get_temp(pass_id));
@@ -882,7 +915,7 @@ pub fn options_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
             app.ui.status_error = true;
         }
     }
-    if font_picker(ui, &mut fam, 170.0) {
+    if font_picker(app, ui, &mut fam, 170.0) {
         app.ui.tool_options.type_font = fam.clone();
         let st = styles(&fam);
         style = if st.contains(&style) { style } else { st.first().cloned().unwrap_or_else(|| "Regular".into()) };
@@ -1184,7 +1217,7 @@ fn type_sections(app: &mut PhotocraftApp, ui: &mut egui::Ui, character: bool, pa
         let w = field_width(full, 2, LABEL_W);
         let mut fam = c.font_family.clone();
         row(ui, &mut |ui| {
-            if font_picker(ui, &mut fam, full) {
+            if font_picker(app, ui, &mut fam, full) {
                 app.ui.tool_options.type_font = fam.clone();
                 let st = styles(&fam);
                 let style = if st.contains(&c.font_style) { c.font_style.clone() } else { st.first().cloned().unwrap_or_else(|| tl!("Regular").into()) };

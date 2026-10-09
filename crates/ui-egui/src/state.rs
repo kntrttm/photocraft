@@ -872,6 +872,9 @@ pub struct UiState {
     /// Character/Paragraph Styles, Glyphs and Check Spelling (see `type_panels_ui`).
     #[serde(default)]
     pub type_panels: crate::type_panels_ui::TypePanelsUi,
+    /// The font picker's Find More tab, downloads and their state (see `fonts_ui`).
+    #[serde(default)]
+    pub fonts: crate::fonts_ui::FontsUi,
     /// Ruler/Count/Note tools, Measurement Log and Notes panels (see `analysis_ui`).
     #[serde(default)]
     pub analysis: crate::analysis_ui::AnalysisUi,
@@ -979,6 +982,7 @@ impl Default for UiState {
             layer_comp_selected: None,
             presets_ui: Default::default(),
             type_panels: Default::default(),
+            fonts: Default::default(),
             analysis: Default::default(),
             timeline: Default::default(),
             slices: Default::default(),
