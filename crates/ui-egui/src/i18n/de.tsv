@@ -2309,3 +2309,62 @@ fontWeight	Italic	Kursiv
 	Transparency Threshold	Transparenz-Schwellenwert
 	Opacity Threshold	Deckkraft-Schwellenwert
 	Allow online fonts	Online-Schriften zulassen
+	Fonts	Schriften
+	Find More	Mehr finden
+	Search Google Fonts	Google Fonts durchsuchen
+	All categories	Alle Kategorien
+	Sans Serif	Serifenlos
+	Serif	Serifen
+	Display	Display
+	Handwriting	Handschrift
+	Monospace	Festbreite
+	All languages	Alle Sprachen
+	Latin	Lateinisch
+	Japanese	Japanisch
+	Korean	Koreanisch
+	Chinese (Simplified)	Chinesisch (vereinfacht)
+	Chinese (Traditional)	Chinesisch (traditionell)
+	Cyrillic	Kyrillisch
+	Greek	Griechisch
+	Arabic	Arabisch
+	Hebrew	Hebräisch
+	Thai	Thailändisch
+	Devanagari	Devanagari
+	Vietnamese	Vietnamesisch
+	Variable font: only the default weight is available	Variable Schrift: nur die Standardstärke ist verfügbar
+	Installed	Installiert
+	Download from Google Fonts	Von Google Fonts herunterladen
+	Loading Google Fonts…	Google Fonts wird geladen…
+	No fonts found	Keine Schriften gefunden
+	Showing {shown} of {total} fonts	{shown} von {total} Schriften angezeigt
+	Download fonts from Google Fonts?	Schriften von Google Fonts herunterladen?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	„Mehr finden“ listet die Open-Source-Schriften von Google Fonts auf. Die Schriftliste und die gewählten Schriften werden über jsDelivr und GitHub von Google Fonts heruntergeladen. Beim Start von PhotoCraft wird nichts heruntergeladen, und Sie können dies jederzeit unter Voreinstellungen › Text ausschalten.
+	Allow	Zulassen
+	Not now	Jetzt nicht
+	Online fonts are not available in this build.	Online-Schriften sind in dieser Version nicht verfügbar.
+	The Google Fonts list is not set up in this build.	Die Google-Fonts-Liste ist in dieser Version nicht eingerichtet.
+	Couldn't load Google Fonts	Google Fonts konnte nicht geladen werden
+	Retry	Erneut versuchen
+	A font named “{family}” is already available and stays in use.	Eine Schrift namens „{family}“ ist bereits vorhanden und bleibt in Verwendung.
+	Downloaded {family}	{family} heruntergeladen
+	Downloaded: {fonts}	Heruntergeladen: {fonts}
+	Manage Downloaded Fonts	Heruntergeladene Schriften verwalten
+	Manage downloaded fonts…	Heruntergeladene Schriften verwalten…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Noch keine Schriften heruntergeladen. Im Reiter „Mehr finden“ des Schriftmenüs können Sie welche laden.
+	Family	Familie
+	License	Lizenz
+	Remove anyway	Trotzdem entfernen
+	Keep	Behalten
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	„{family}“ wird von {layers} in {documents} verwendet. Wenn Sie sie entfernen, zeigen diese Ebenen eine fehlende Schrift an.
+	“{family}” was removed. Affected text layers: {count}.	„{family}“ wurde entfernt. Betroffene Textebenen: {count}.
+	“{family}” was removed.	„{family}“ wurde entfernt.
+	No fonts are missing.	Es fehlen keine Schriften.
+	These fonts are not installed:	Diese Schriften sind nicht installiert:
+	Available on Google Fonts	Bei Google Fonts verfügbar
+	Don't replace	Nicht ersetzen
+	Replace with	Ersetzen durch
+	Allow online fonts to look for these fonts on Google Fonts.	Erlauben Sie Online-Schriften, um diese Schriften bei Google Fonts zu suchen.
+	Downloading…	Wird heruntergeladen…
+@plural	{n} style|{n} styles	{n} Stil|{n} Stile
+@plural	{n} text layer|{n} text layers	{n} Textebene|{n} Textebenen
+@plural	{n} open document|{n} open documents	{n} geöffnetem Dokument|{n} geöffneten Dokumenten

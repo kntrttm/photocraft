@@ -2680,3 +2680,62 @@ fontWeight	Italic	Miring
 	Transparency Threshold	Ambang transparansi
 	Opacity Threshold	Ambang opasitas
 	Allow online fonts	Izinkan font online
+	Fonts	Font
+	Find More	Temukan Lainnya
+	Search Google Fonts	Cari di Google Fonts
+	All categories	Semua kategori
+	Sans Serif	Sans Serif
+	Serif	Serif
+	Display	Display
+	Handwriting	Tulisan tangan
+	Monospace	Monospace
+	All languages	Semua bahasa
+	Latin	Latin
+	Japanese	Jepang
+	Korean	Korea
+	Chinese (Simplified)	Tionghoa (Sederhana)
+	Chinese (Traditional)	Tionghoa (Tradisional)
+	Cyrillic	Sirilik
+	Greek	Yunani
+	Arabic	Arab
+	Hebrew	Ibrani
+	Thai	Thai
+	Devanagari	Devanagari
+	Vietnamese	Vietnam
+	Variable font: only the default weight is available	Font variabel: hanya bobot default yang tersedia
+	Installed	Terpasang
+	Download from Google Fonts	Unduh dari Google Fonts
+	Loading Google Fonts…	Memuat Google Fonts…
+	No fonts found	Font tidak ditemukan
+	Showing {shown} of {total} fonts	Menampilkan {shown} dari {total} font
+	Download fonts from Google Fonts?	Unduh font dari Google Fonts?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	Temukan Lainnya menampilkan font sumber terbuka dari Google Fonts. Daftar font dan font yang Anda pilih diunduh dari Google Fonts melalui jsDelivr dan GitHub. Tidak ada yang diunduh saat PhotoCraft dimulai, dan Anda dapat menonaktifkannya kapan saja di Preferensi › Teks.
+	Allow	Izinkan
+	Not now	Nanti saja
+	Online fonts are not available in this build.	Font online tidak tersedia di versi ini.
+	The Google Fonts list is not set up in this build.	Daftar Google Fonts belum disiapkan di versi ini.
+	Couldn't load Google Fonts	Tidak dapat memuat Google Fonts
+	Retry	Coba lagi
+	A font named “{family}” is already available and stays in use.	Font bernama “{family}” sudah tersedia dan tetap digunakan.
+	Downloaded {family}	{family} telah diunduh
+	Downloaded: {fonts}	Diunduh: {fonts}
+	Manage Downloaded Fonts	Kelola font yang diunduh
+	Manage downloaded fonts…	Kelola font yang diunduh…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Belum ada font yang diunduh. Gunakan tab Temukan Lainnya di menu font untuk mendapatkannya.
+	Family	Keluarga
+	License	Lisensi
+	Remove anyway	Tetap hapus
+	Keep	Pertahankan
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	“{family}” digunakan oleh {layers} di {documents}. Jika dihapus, lapisan tersebut akan menampilkan font yang hilang.
+	“{family}” was removed. Affected text layers: {count}.	“{family}” dihapus. Lapisan teks terdampak: {count}.
+	“{family}” was removed.	“{family}” dihapus.
+	No fonts are missing.	Tidak ada font yang hilang.
+	These fonts are not installed:	Font berikut tidak terpasang:
+	Available on Google Fonts	Tersedia di Google Fonts
+	Don't replace	Jangan ganti
+	Replace with	Ganti dengan
+	Allow online fonts to look for these fonts on Google Fonts.	Izinkan font online untuk mencari font ini di Google Fonts.
+	Downloading…	Mengunduh…
+@plural	{n} style|{n} styles	{n} gaya
+@plural	{n} text layer|{n} text layers	{n} lapisan teks
+@plural	{n} open document|{n} open documents	{n} dokumen terbuka

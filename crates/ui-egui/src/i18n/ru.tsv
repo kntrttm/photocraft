@@ -2542,3 +2542,62 @@ fontWeight	Italic	Курсив
 	Transparency Threshold	Порог прозрачности
 	Opacity Threshold	Порог непрозрачности
 	Allow online fonts	Разрешить онлайн-шрифты
+	Fonts	Шрифты
+	Find More	Найти ещё
+	Search Google Fonts	Поиск в Google Fonts
+	All categories	Все категории
+	Sans Serif	Без засечек
+	Serif	С засечками
+	Display	Акцидентные
+	Handwriting	Рукописные
+	Monospace	Моноширинные
+	All languages	Все языки
+	Latin	Латиница
+	Japanese	Японский
+	Korean	Корейский
+	Chinese (Simplified)	Китайский (упрощённый)
+	Chinese (Traditional)	Китайский (традиционный)
+	Cyrillic	Кириллица
+	Greek	Греческий
+	Arabic	Арабский
+	Hebrew	Иврит
+	Thai	Тайский
+	Devanagari	Деванагари
+	Vietnamese	Вьетнамский
+	Variable font: only the default weight is available	Вариативный шрифт: доступна только насыщенность по умолчанию
+	Installed	Установлен
+	Download from Google Fonts	Скачать из Google Fonts
+	Loading Google Fonts…	Загрузка Google Fonts…
+	No fonts found	Шрифты не найдены
+	Showing {shown} of {total} fonts	Показано {shown} из {total} шрифтов
+	Download fonts from Google Fonts?	Скачивать шрифты из Google Fonts?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	«Найти ещё» показывает шрифты Google Fonts с открытым исходным кодом. Список шрифтов и выбранные вами шрифты скачиваются из Google Fonts через jsDelivr и GitHub. При запуске PhotoCraft ничего не скачивается, а отключить эту функцию можно в любой момент в разделе «Настройки › Текст».
+	Allow	Разрешить
+	Not now	Не сейчас
+	Online fonts are not available in this build.	В этой сборке онлайн-шрифты недоступны.
+	The Google Fonts list is not set up in this build.	В этой сборке список Google Fonts не настроен.
+	Couldn't load Google Fonts	Не удалось загрузить Google Fonts
+	Retry	Повторить
+	A font named “{family}” is already available and stays in use.	Шрифт «{family}» уже доступен и продолжает использоваться.
+	Downloaded {family}	Скачан шрифт {family}
+	Downloaded: {fonts}	Скачано: {fonts}
+	Manage Downloaded Fonts	Управление скачанными шрифтами
+	Manage downloaded fonts…	Управление скачанными шрифтами…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Скачанных шрифтов пока нет. Загрузите их на вкладке «Найти ещё» в меню шрифтов.
+	Family	Семейство
+	License	Лицензия
+	Remove anyway	Всё равно удалить
+	Keep	Оставить
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	«{family}» используется ({layers}; {documents}). После удаления эти слои будут показаны как слои с отсутствующим шрифтом.
+	“{family}” was removed. Affected text layers: {count}.	Шрифт «{family}» удалён. Затронуто текстовых слоёв: {count}.
+	“{family}” was removed.	Шрифт «{family}» удалён.
+	No fonts are missing.	Отсутствующих шрифтов нет.
+	These fonts are not installed:	Эти шрифты не установлены:
+	Available on Google Fonts	Доступен в Google Fonts
+	Don't replace	Не заменять
+	Replace with	Заменить на
+	Allow online fonts to look for these fonts on Google Fonts.	Разрешите онлайн-шрифты, чтобы искать эти шрифты в Google Fonts.
+	Downloading…	Скачивание…
+@plural	{n} style|{n} styles	{n} начертание|{n} начертания|{n} начертаний
+@plural	{n} text layer|{n} text layers	{n} текстовый слой|{n} текстовых слоя|{n} текстовых слоёв
+@plural	{n} open document|{n} open documents	{n} открытый документ|{n} открытых документа|{n} открытых документов

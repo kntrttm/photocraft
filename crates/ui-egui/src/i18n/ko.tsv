@@ -2849,3 +2849,62 @@ fontWeight	Italic	기울임
 	Transparency Threshold	투명도 한계값
 	Opacity Threshold	불투명도 한계값
 	Allow online fonts	온라인 글꼴 허용
+	Fonts	글꼴
+	Find More	더 찾기
+	Search Google Fonts	Google Fonts 검색
+	All categories	모든 카테고리
+	Sans Serif	산세리프
+	Serif	세리프
+	Display	디스플레이
+	Handwriting	손글씨
+	Monospace	고정폭
+	All languages	모든 언어
+	Latin	라틴어
+	Japanese	일본어
+	Korean	한국어
+	Chinese (Simplified)	중국어(간체)
+	Chinese (Traditional)	중국어(번체)
+	Cyrillic	키릴 문자
+	Greek	그리스어
+	Arabic	아랍어
+	Hebrew	히브리어
+	Thai	태국어
+	Devanagari	데바나가리
+	Vietnamese	베트남어
+	Variable font: only the default weight is available	가변 글꼴: 기본 두께만 사용할 수 있습니다
+	Installed	설치됨
+	Download from Google Fonts	Google Fonts에서 다운로드
+	Loading Google Fonts…	Google Fonts 불러오는 중…
+	No fonts found	글꼴을 찾을 수 없습니다
+	Showing {shown} of {total} fonts	글꼴 {total}개 중 {shown}개 표시
+	Download fonts from Google Fonts?	Google Fonts에서 글꼴을 다운로드할까요?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	‘더 찾기’에는 Google Fonts의 오픈 소스 글꼴이 표시됩니다. 글꼴 목록과 선택한 글꼴은 jsDelivr와 GitHub를 통해 Google Fonts에서 다운로드됩니다. PhotoCraft를 시작할 때는 아무것도 다운로드되지 않으며, 환경 설정 › 문자에서 언제든지 끌 수 있습니다.
+	Allow	허용
+	Not now	나중에
+	Online fonts are not available in this build.	이 빌드에서는 온라인 글꼴을 사용할 수 없습니다.
+	The Google Fonts list is not set up in this build.	이 빌드에는 Google Fonts 목록이 설정되어 있지 않습니다.
+	Couldn't load Google Fonts	Google Fonts를 불러올 수 없습니다
+	Retry	다시 시도
+	A font named “{family}” is already available and stays in use.	‘{family}’ 글꼴이 이미 있어 기존 글꼴이 계속 사용됩니다.
+	Downloaded {family}	{family} 다운로드됨
+	Downloaded: {fonts}	다운로드됨: {fonts}
+	Manage Downloaded Fonts	다운로드한 글꼴 관리
+	Manage downloaded fonts…	다운로드한 글꼴 관리…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	다운로드한 글꼴이 아직 없습니다. 글꼴 메뉴의 ‘더 찾기’ 탭에서 받을 수 있습니다.
+	Family	글꼴 패밀리
+	License	라이선스
+	Remove anyway	그래도 제거
+	Keep	유지
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	‘{family}’은(는) {documents}의 {layers}에서 사용 중입니다. 제거하면 해당 레이어에 누락된 글꼴이 표시됩니다.
+	“{family}” was removed. Affected text layers: {count}.	‘{family}’을(를) 제거했습니다. 영향을 받은 텍스트 레이어: {count}개
+	“{family}” was removed.	‘{family}’을(를) 제거했습니다.
+	No fonts are missing.	누락된 글꼴이 없습니다.
+	These fonts are not installed:	다음 글꼴이 설치되어 있지 않습니다:
+	Available on Google Fonts	Google Fonts에서 받을 수 있음
+	Don't replace	대체하지 않음
+	Replace with	대체할 글꼴
+	Allow online fonts to look for these fonts on Google Fonts.	온라인 글꼴을 허용하면 Google Fonts에서 이 글꼴을 찾을 수 있습니다.
+	Downloading…	다운로드 중…
+@plural	{n} style|{n} styles	스타일 {n}개
+@plural	{n} text layer|{n} text layers	텍스트 레이어 {n}개
+@plural	{n} open document|{n} open documents	열려 있는 문서 {n}개

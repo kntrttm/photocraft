@@ -2339,3 +2339,62 @@ fontWeight	Italic	Cursiva
 	Transparency Threshold	Umbral de transparencia
 	Opacity Threshold	Umbral de opacidad
 	Allow online fonts	Permitir fuentes en línea
+	Fonts	Fuentes
+	Find More	Buscar más
+	Search Google Fonts	Buscar en Google Fonts
+	All categories	Todas las categorías
+	Sans Serif	Sans serif
+	Serif	Serif
+	Display	Decorativa
+	Handwriting	Manuscrita
+	Monospace	Monoespaciada
+	All languages	Todos los idiomas
+	Latin	Latino
+	Japanese	Japonés
+	Korean	Coreano
+	Chinese (Simplified)	Chino (simplificado)
+	Chinese (Traditional)	Chino (tradicional)
+	Cyrillic	Cirílico
+	Greek	Griego
+	Arabic	Árabe
+	Hebrew	Hebreo
+	Thai	Tailandés
+	Devanagari	Devanagari
+	Vietnamese	Vietnamita
+	Variable font: only the default weight is available	Fuente variable: solo está disponible el grosor predeterminado
+	Installed	Instalada
+	Download from Google Fonts	Descargar de Google Fonts
+	Loading Google Fonts…	Cargando Google Fonts…
+	No fonts found	No se encontraron fuentes
+	Showing {shown} of {total} fonts	Mostrando {shown} de {total} fuentes
+	Download fonts from Google Fonts?	¿Descargar fuentes de Google Fonts?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	Buscar más muestra las fuentes de código abierto de Google Fonts. La lista de fuentes y las fuentes que elijas se descargan de Google Fonts a través de jsDelivr y GitHub. No se descarga nada al iniciar PhotoCraft y puedes desactivarlo en cualquier momento en Preferencias › Texto.
+	Allow	Permitir
+	Not now	Ahora no
+	Online fonts are not available in this build.	Las fuentes en línea no están disponibles en esta versión.
+	The Google Fonts list is not set up in this build.	La lista de Google Fonts no está configurada en esta versión.
+	Couldn't load Google Fonts	No se pudo cargar Google Fonts
+	Retry	Reintentar
+	A font named “{family}” is already available and stays in use.	Ya hay una fuente llamada «{family}» disponible, que sigue en uso.
+	Downloaded {family}	Se descargó {family}
+	Downloaded: {fonts}	Descargadas: {fonts}
+	Manage Downloaded Fonts	Administrar fuentes descargadas
+	Manage downloaded fonts…	Administrar fuentes descargadas…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Aún no hay fuentes descargadas. Usa la pestaña «Buscar más» del menú de fuentes para obtenerlas.
+	Family	Familia
+	License	Licencia
+	Remove anyway	Quitar de todos modos
+	Keep	Conservar
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	«{family}» se usa en {layers} de {documents}. Si la quitas, esas capas mostrarán fuentes que faltan.
+	“{family}” was removed. Affected text layers: {count}.	Se quitó «{family}». Capas de texto afectadas: {count}.
+	“{family}” was removed.	Se quitó «{family}».
+	No fonts are missing.	No faltan fuentes.
+	These fonts are not installed:	Estas fuentes no están instaladas:
+	Available on Google Fonts	Disponible en Google Fonts
+	Don't replace	No reemplazar
+	Replace with	Reemplazar con
+	Allow online fonts to look for these fonts on Google Fonts.	Permite las fuentes en línea para buscar estas fuentes en Google Fonts.
+	Downloading…	Descargando…
+@plural	{n} style|{n} styles	{n} estilo|{n} estilos
+@plural	{n} text layer|{n} text layers	{n} capa de texto|{n} capas de texto
+@plural	{n} open document|{n} open documents	{n} documento abierto|{n} documentos abiertos

@@ -689,10 +689,7 @@ fn remove_family(app: &mut PhotocraftApp, f: &mut Value, family: &str, force: bo
             app.ui.fonts.results.iter_mut().filter(|e| e.family.eq_ignore_ascii_case(family)).for_each(|e| e.installed = false);
             let layers = v.get("affectedLayers").and_then(Value::as_u64).unwrap_or(0);
             let msg = if layers > 0 {
-                crate::i18n::fmt(
-                    tl!("“{family}” was removed. {layers} now have a missing font."),
-                    &[("family", family), ("layers", &pluralize(layers, "{n} text layer", "{n} text layers"))],
-                )
+                crate::i18n::fmt(tl!("“{family}” was removed. Affected text layers: {count}."), &[("family", family), ("count", &layers.to_string())])
             } else {
                 crate::i18n::fmt(tl!("“{family}” was removed."), &[("family", family)])
             };

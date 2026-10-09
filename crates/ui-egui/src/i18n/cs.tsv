@@ -2270,3 +2270,62 @@ fontWeight	Italic	Kurzíva
 	Transparency Threshold	Práh průhlednosti
 	Opacity Threshold	Práh krytí
 	Allow online fonts	Povolit online písma
+	Fonts	Písma
+	Find More	Najít další
+	Search Google Fonts	Hledat v Google Fonts
+	All categories	Všechny kategorie
+	Sans Serif	Bezpatkové
+	Serif	Patkové
+	Display	Dekorativní
+	Handwriting	Ručně psané
+	Monospace	Neproporcionální
+	All languages	Všechny jazyky
+	Latin	Latinka
+	Japanese	Japonština
+	Korean	Korejština
+	Chinese (Simplified)	Čínština (zjednodušená)
+	Chinese (Traditional)	Čínština (tradiční)
+	Cyrillic	Cyrilice
+	Greek	Řečtina
+	Arabic	Arabština
+	Hebrew	Hebrejština
+	Thai	Thajština
+	Devanagari	Dévanágarí
+	Vietnamese	Vietnamština
+	Variable font: only the default weight is available	Proměnné písmo: k dispozici je jen výchozí tloušťka
+	Installed	Nainstalováno
+	Download from Google Fonts	Stáhnout z Google Fonts
+	Loading Google Fonts…	Načítání Google Fonts…
+	No fonts found	Nebyla nalezena žádná písma
+	Showing {shown} of {total} fonts	Zobrazeno {shown} z {total} písem
+	Download fonts from Google Fonts?	Stahovat písma z Google Fonts?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	Najít další zobrazí open-source písma z Google Fonts. Seznam písem a písma, která si vyberete, se stahují z Google Fonts přes jsDelivr a GitHub. Při spuštění PhotoCraft se nic nestahuje a tuto funkci můžete kdykoli vypnout v Předvolby › Text.
+	Allow	Povolit
+	Not now	Teď ne
+	Online fonts are not available in this build.	V této verzi nejsou online písma k dispozici.
+	The Google Fonts list is not set up in this build.	V této verzi není seznam Google Fonts nastaven.
+	Couldn't load Google Fonts	Google Fonts se nepodařilo načíst
+	Retry	Zkusit znovu
+	A font named “{family}” is already available and stays in use.	Písmo s názvem „{family}“ je již k dispozici a zůstává v používání.
+	Downloaded {family}	Staženo: {family}
+	Downloaded: {fonts}	Staženo: {fonts}
+	Manage Downloaded Fonts	Správa stažených písem
+	Manage downloaded fonts…	Správa stažených písem…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Zatím nejsou stažena žádná písma. Získáte je na kartě Najít další v nabídce písem.
+	Family	Rodina
+	License	Licence
+	Remove anyway	Přesto odstranit
+	Keep	Ponechat
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	Písmo „{family}“ se používá ({layers}; {documents}). Po odebrání se tyto vrstvy zobrazí s chybějícím písmem.
+	“{family}” was removed. Affected text layers: {count}.	Písmo „{family}“ bylo odebráno. Dotčené textové vrstvy: {count}.
+	“{family}” was removed.	Písmo „{family}“ bylo odebráno.
+	No fonts are missing.	Žádná písma nechybí.
+	These fonts are not installed:	Tato písma nejsou nainstalována:
+	Available on Google Fonts	K dispozici na Google Fonts
+	Don't replace	Nenahrazovat
+	Replace with	Nahradit čím
+	Allow online fonts to look for these fonts on Google Fonts.	Povolte online písma, aby se tato písma hledala v Google Fonts.
+	Downloading…	Stahování…
+@plural	{n} style|{n} styles	{n} styl|{n} styly|{n} stylů
+@plural	{n} text layer|{n} text layers	{n} textová vrstva|{n} textové vrstvy|{n} textových vrstev
+@plural	{n} open document|{n} open documents	{n} otevřený dokument|{n} otevřené dokumenty|{n} otevřených dokumentů

@@ -362,7 +362,7 @@ fn manage_lists_removes_and_warns_before_removing_a_font_in_use() {
     h.run_steps(3);
     assert!(!listed("Zqbha"));
     assert!(fonts.store.list_for_test().is_empty());
-    h.get_by_label_contains("1 text layer now have a missing font");
+    h.get_by_label_contains("Affected text layers: 1");
     // Those layers are missing fonts now, and no re-layout happened.
     let missing = h.state_mut().session.execute("type.resolveMissingFonts", json!({})).unwrap();
     assert_eq!(missing["missing"], json!(["Zqbha"]));
@@ -440,4 +440,28 @@ fn ui_state_for_fonts_is_in_inspect_and_ui_set() {
     assert_eq!(v["result"]["fonts"]["tab"], "findMore");
     assert_eq!(v["result"]["fonts"]["query"], "lora");
     assert_eq!(call(&mut app, "ui.set", json!({"fonts": {"tab": 3}}))["ok"], false);
+}
+
+#[test]
+fn every_label_of_the_google_fonts_ui_is_translated() {
+    let dynamic: Vec<&str> = CATEGORIES
+        .iter()
+        .chain(SUBSETS.iter())
+        .map(|(_, l)| *l)
+        .chain(["Manage Downloaded Fonts", "Resolve Missing Fonts…", "Family", "License", "Size", "Remove", "Fonts", "Find More"])
+        .collect();
+    for lang in crate::i18n::Lang::all().filter(|l| l.complete_menus()) {
+        for s in &dynamic {
+            assert!(crate::i18n::has(lang, s), "{}: `{s}` is not translated", lang.code());
+        }
+        for (one, other) in [("{n} style", "{n} styles"), ("{n} text layer", "{n} text layers"), ("{n} open document", "{n} open documents")] {
+            for n in [1u64, 2, 5] {
+                let shown = crate::i18n::trn(lang, n, one, other);
+                assert!(!shown.contains("{n}") && shown.contains(&n.to_string()), "{}: {shown}", lang.code());
+                // French spells "style" like English.
+                let same_word = lang.code() == "fr" && one == "{n} style";
+                assert!(same_word || shown != other.replace("{n}", &n.to_string()), "{}: plural `{other}` is not translated", lang.code());
+            }
+        }
+    }
 }

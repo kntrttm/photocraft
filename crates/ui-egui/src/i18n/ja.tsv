@@ -3297,3 +3297,62 @@ fontWeight	Italic	斜体
 	Transparency Threshold	透明のしきい値
 	Opacity Threshold	不透明度のしきい値
 	Allow online fonts	オンラインフォントを許可
+	Fonts	フォント
+	Find More	もっと見つける
+	Search Google Fonts	Google Fontsを検索
+	All categories	すべてのカテゴリ
+	Sans Serif	サンセリフ
+	Serif	セリフ
+	Display	ディスプレイ
+	Handwriting	手書き
+	Monospace	等幅
+	All languages	すべての言語
+	Latin	ラテン文字
+	Japanese	日本語
+	Korean	韓国語
+	Chinese (Simplified)	中国語（簡体字）
+	Chinese (Traditional)	中国語（繁体字）
+	Cyrillic	キリル文字
+	Greek	ギリシャ文字
+	Arabic	アラビア文字
+	Hebrew	ヘブライ文字
+	Thai	タイ文字
+	Devanagari	デーヴァナーガリー
+	Vietnamese	ベトナム語
+	Variable font: only the default weight is available	可変フォント：標準のウェイトのみ利用できます
+	Installed	インストール済み
+	Download from Google Fonts	Google Fonts からダウンロード
+	Loading Google Fonts…	Google Fonts を読み込み中…
+	No fonts found	フォントが見つかりません
+	Showing {shown} of {total} fonts	{total} 件中 {shown} 件を表示
+	Download fonts from Google Fonts?	Google Fonts からフォントをダウンロードしますか？
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	「もっと見つける」には Google Fonts のオープンソースフォントが一覧表示されます。フォントの一覧と選択したフォントは、jsDelivr と GitHub を経由して Google Fonts からダウンロードされます。PhotoCraft の起動時には何もダウンロードされません。この設定は、環境設定 › 文字 でいつでもオフにできます。
+	Allow	許可
+	Not now	今はしない
+	Online fonts are not available in this build.	このビルドではオンラインフォントを利用できません。
+	The Google Fonts list is not set up in this build.	このビルドでは Google Fonts の一覧が設定されていません。
+	Couldn't load Google Fonts	Google Fonts を読み込めませんでした
+	Retry	再試行
+	A font named “{family}” is already available and stays in use.	「{family}」という名前のフォントはすでに利用可能なため、そちらが引き続き使用されます。
+	Downloaded {family}	{family} をダウンロードしました
+	Downloaded: {fonts}	ダウンロードしました：{fonts}
+	Manage Downloaded Fonts	ダウンロードしたフォントを管理
+	Manage downloaded fonts…	ダウンロードしたフォントを管理…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	ダウンロードしたフォントはまだありません。フォントメニューの「もっと見つける」タブから入手できます。
+	Family	ファミリー
+	License	ライセンス
+	Remove anyway	強制的に削除
+	Keep	残す
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	「{family}」は {documents}の {layers} で使用されています。削除すると、それらのレイヤーは不足しているフォントとして表示されます。
+	“{family}” was removed. Affected text layers: {count}.	「{family}」を削除しました。影響を受けるテキストレイヤー：{count}
+	“{family}” was removed.	「{family}」を削除しました。
+	No fonts are missing.	不足しているフォントはありません。
+	These fonts are not installed:	次のフォントがインストールされていません：
+	Available on Google Fonts	Google Fonts で入手できます
+	Don't replace	置き換えない
+	Replace with	置き換え先
+	Allow online fonts to look for these fonts on Google Fonts.	Google Fonts でこれらのフォントを探すために、オンラインフォントを許可します。
+	Downloading…	ダウンロード中…
+@plural	{n} style|{n} styles	{n} スタイル
+@plural	{n} text layer|{n} text layers	{n} 個のテキストレイヤー
+@plural	{n} open document|{n} open documents	開いている {n} 個のドキュメント

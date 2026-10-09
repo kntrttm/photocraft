@@ -2693,3 +2693,62 @@ fontWeight	Italic	Italique
 	Transparency Threshold	Seuil de transparence
 	Opacity Threshold	Seuil d'opacité
 	Allow online fonts	Autoriser les polices en ligne
+	Fonts	Polices
+	Find More	Trouver plus
+	Search Google Fonts	Rechercher dans Google Fonts
+	All categories	Toutes les catégories
+	Sans Serif	Sans empattement
+	Serif	Avec empattement
+	Display	Titrage
+	Handwriting	Manuscrite
+	Monospace	Chasse fixe
+	All languages	Toutes les langues
+	Latin	Latin
+	Japanese	Japonais
+	Korean	Coréen
+	Chinese (Simplified)	Chinois (simplifié)
+	Chinese (Traditional)	Chinois (traditionnel)
+	Cyrillic	Cyrillique
+	Greek	Grec
+	Arabic	Arabe
+	Hebrew	Hébreu
+	Thai	Thaï
+	Devanagari	Devanagari
+	Vietnamese	Vietnamien
+	Variable font: only the default weight is available	Police variable : seule la graisse par défaut est disponible
+	Installed	Installée
+	Download from Google Fonts	Télécharger depuis Google Fonts
+	Loading Google Fonts…	Chargement de Google Fonts…
+	No fonts found	Aucune police trouvée
+	Showing {shown} of {total} fonts	{shown} polices affichées sur {total}
+	Download fonts from Google Fonts?	Télécharger des polices depuis Google Fonts ?
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	Trouver plus affiche les polices open source de Google Fonts. La liste des polices et les polices que vous choisissez sont téléchargées depuis Google Fonts via jsDelivr et GitHub. Rien n'est téléchargé au démarrage de PhotoCraft, et vous pouvez désactiver cette option à tout moment dans Préférences › Texte.
+	Allow	Autoriser
+	Not now	Pas maintenant
+	Online fonts are not available in this build.	Les polices en ligne ne sont pas disponibles dans cette version.
+	The Google Fonts list is not set up in this build.	La liste Google Fonts n'est pas configurée dans cette version.
+	Couldn't load Google Fonts	Impossible de charger Google Fonts
+	Retry	Réessayer
+	A font named “{family}” is already available and stays in use.	Une police nommée « {family} » est déjà disponible et reste utilisée.
+	Downloaded {family}	{family} téléchargée
+	Downloaded: {fonts}	Téléchargées : {fonts}
+	Manage Downloaded Fonts	Gérer les polices téléchargées
+	Manage downloaded fonts…	Gérer les polices téléchargées…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	Aucune police téléchargée pour l'instant. Utilisez l'onglet « Trouver plus » du menu des polices pour en obtenir.
+	Family	Famille
+	License	Licence
+	Remove anyway	Retirer quand même
+	Keep	Conserver
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	« {family} » est utilisée par {layers} dans {documents}. Si vous la retirez, ces calques afficheront une police manquante.
+	“{family}” was removed. Affected text layers: {count}.	« {family} » a été retirée. Calques de texte concernés : {count}.
+	“{family}” was removed.	« {family} » a été retirée.
+	No fonts are missing.	Aucune police manquante.
+	These fonts are not installed:	Ces polices ne sont pas installées :
+	Available on Google Fonts	Disponible sur Google Fonts
+	Don't replace	Ne pas remplacer
+	Replace with	Remplacer par
+	Allow online fonts to look for these fonts on Google Fonts.	Autorisez les polices en ligne pour chercher ces polices dans Google Fonts.
+	Downloading…	Téléchargement…
+@plural	{n} style|{n} styles	{n} style|{n} styles
+@plural	{n} text layer|{n} text layers	{n} calque de texte|{n} calques de texte
+@plural	{n} open document|{n} open documents	{n} document ouvert|{n} documents ouverts

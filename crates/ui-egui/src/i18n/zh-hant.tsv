@@ -2247,3 +2247,62 @@ fontWeight	Italic	斜體
 	Transparency Threshold	透明度臨界值
 	Opacity Threshold	不透明度臨界值
 	Allow online fonts	允許線上字型
+	Fonts	字型
+	Find More	尋找更多
+	Search Google Fonts	搜尋 Google Fonts
+	All categories	所有類別
+	Sans Serif	無襯線
+	Serif	襯線
+	Display	展示
+	Handwriting	手寫
+	Monospace	等寬
+	All languages	所有語言
+	Latin	拉丁文
+	Japanese	日文
+	Korean	韓文
+	Chinese (Simplified)	簡體中文
+	Chinese (Traditional)	繁體中文
+	Cyrillic	西里爾文
+	Greek	希臘文
+	Arabic	阿拉伯文
+	Hebrew	希伯來文
+	Thai	泰文
+	Devanagari	天城文
+	Vietnamese	越南文
+	Variable font: only the default weight is available	可變字型：僅提供預設字重
+	Installed	已安裝
+	Download from Google Fonts	從 Google Fonts 下載
+	Loading Google Fonts…	正在載入 Google Fonts…
+	No fonts found	找不到字型
+	Showing {shown} of {total} fonts	顯示 {total} 個字型中的 {shown} 個
+	Download fonts from Google Fonts?	要從 Google Fonts 下載字型嗎？
+	Find More lists the open-source fonts of Google Fonts. The font list and the fonts you choose are downloaded from Google Fonts through jsDelivr and GitHub. Nothing is downloaded when PhotoCraft starts, and you can turn this off at any time in Preferences › Type.	「尋找更多」會列出 Google Fonts 的開源字型。字型清單與您選擇的字型會透過 jsDelivr 和 GitHub 從 Google Fonts 下載。PhotoCraft 啟動時不會下載任何內容，您可隨時在「偏好設定 › 文字」中關閉此功能。
+	Allow	允許
+	Not now	暫不
+	Online fonts are not available in this build.	此版本不支援線上字型。
+	The Google Fonts list is not set up in this build.	此版本未設定 Google Fonts 清單。
+	Couldn't load Google Fonts	無法載入 Google Fonts
+	Retry	重試
+	A font named “{family}” is already available and stays in use.	已有名為「{family}」的字型，將繼續使用現有字型。
+	Downloaded {family}	已下載 {family}
+	Downloaded: {fonts}	已下載：{fonts}
+	Manage Downloaded Fonts	管理已下載的字型
+	Manage downloaded fonts…	管理已下載的字型…
+	No downloaded fonts yet. Use the Find More tab of the font menu to get some.	尚未下載任何字型。請在字型選單的「尋找更多」分頁中取得。
+	Family	字型系列
+	License	授權
+	Remove anyway	仍要移除
+	Keep	保留
+	“{family}” is used by {layers} in {documents}. If you remove it, those layers will show as missing fonts.	「{family}」正被 {documents} 中的 {layers} 使用。若將其移除，這些圖層將顯示為遺失的字型。
+	“{family}” was removed. Affected text layers: {count}.	已移除「{family}」。受影響的文字圖層：{count}
+	“{family}” was removed.	已移除「{family}」。
+	No fonts are missing.	沒有遺失的字型。
+	These fonts are not installed:	未安裝以下字型：
+	Available on Google Fonts	可在 Google Fonts 取得
+	Don't replace	不取代
+	Replace with	取代為
+	Allow online fonts to look for these fonts on Google Fonts.	允許使用線上字型，以便在 Google Fonts 上尋找這些字型。
+	Downloading…	正在下載…
+@plural	{n} style|{n} styles	{n} 種樣式
+@plural	{n} text layer|{n} text layers	{n} 個文字圖層
+@plural	{n} open document|{n} open documents	{n} 個開啟的文件
