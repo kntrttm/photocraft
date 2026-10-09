@@ -202,8 +202,8 @@ pub struct UiSetParams {
     /// Brush Preset picker there, null closes it), brushPickerView, brushSize, gradientBlendMode
     /// (a blend mode name, for the Gradient tool), gradientClassic (bool), eyedropperSampleSize
     /// ("point" or 1, 3, 5, 11, 31, 51, 101), eyedropperSample (current, currentAndBelow, all,
-    /// allNoAdjustments, currentAndBelowNoAdjustments), eyedropperRing (bool). Other fields are an
-    /// error.
+    /// allNoAdjustments, currentAndBelowNoAdjustments), eyedropperRing (bool), fonts ({tab, query, category, subset}: the font
+    /// picker's Find More view). Other fields are an error.
     pub fields: Value,
 }
 
