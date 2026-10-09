@@ -502,11 +502,29 @@ fn managed_families(slug: &str) -> Vec<String> {
     photocraft_text::shared().lock().unwrap_or_else(PoisonError::into_inner).fonts.managed_families(slug)
 }
 
+/// Is `name` provided by a font that is not one of this store's (bundled, craft or system)?
+/// Then downloading it would change nothing, so nothing is fetched.
+fn provided_elsewhere(svc: &FontServices, name: &str) -> bool {
+    let ours = svc.store.list().into_iter().any(|r| r.family.eq_ignore_ascii_case(name) && !managed_families(&r.slug).is_empty());
+    !ours && photocraft_text::shared().lock().unwrap_or_else(PoisonError::into_inner).fonts.has_family(name)
+}
+
 fn install(s: &mut Session, p: &Value) -> Result<Value> {
     const CMD: &str = "type.fonts.install";
     let name = required_text(p, "family", CMD)?;
     let styles = styles_param(p, CMD)?;
     let svc = online(s)?;
+    if provided_elsewhere(&svc, &name) {
+        return Ok(json!({
+            "family": name,
+            "families": [name],
+            "files": 0,
+            "bytes": 0,
+            "alreadyInstalled": false,
+            "alreadyAvailable": true,
+            "message": format!("a font named `{name}` is already available, so nothing was downloaded"),
+        }));
+    }
     let svc_apply = svc.clone();
     jobs::run(
         s,
@@ -671,6 +689,8 @@ struct Batch {
     /// `(missing name, google family)`.
     targets: Vec<(String, String)>,
     done: Vec<Downloaded>,
+    /// Families that are already available, so nothing was downloaded for them.
+    available: Vec<String>,
     failed: Vec<(String, String)>,
     not_found: Vec<String>,
 }
@@ -699,11 +719,15 @@ pub(crate) fn download_missing(s: &mut Session, missing: Vec<String>) -> Result<
                     families.push(f);
                 }
             }
-            let (mut done, mut failed) = (Vec::new(), Vec::new());
+            let (mut done, mut failed, mut available) = (Vec::new(), Vec::new(), Vec::new());
             let n = families.len().max(1) as f32;
             for (i, name) in families.into_iter().enumerate() {
                 ctx.check()?;
                 let Some(fam) = cat.family(name) else { continue };
+                if provided_elsewhere(&svc, &fam.family) {
+                    available.push(fam.family.clone());
+                    continue;
+                }
                 match download_family(&svc, &cat, fam, &[], ctx, i as f32 / n, (i + 1) as f32 / n) {
                     Ok(d) => done.push(d),
                     Err(EngineError::Cancelled) => return Err(EngineError::Cancelled),
@@ -715,7 +739,7 @@ pub(crate) fn download_missing(s: &mut Session, missing: Vec<String>) -> Result<
             {
                 return Err(EngineError::Other(e.clone()));
             }
-            Ok(Batch { targets, done, failed, not_found })
+            Ok(Batch { targets, done, available, failed, not_found })
         },
         move |s, mut b| {
             let mut installed = Vec::new();
@@ -726,6 +750,8 @@ pub(crate) fn download_missing(s: &mut Session, missing: Vec<String>) -> Result<
                     Err(e) => b.failed.push((family, e.to_string())),
                 }
             }
+            let downloaded = installed.clone();
+            installed.extend(b.available);
             let remap: serde_json::Map<String, Value> = b
                 .targets
                 .iter()
@@ -736,7 +762,7 @@ pub(crate) fn download_missing(s: &mut Session, missing: Vec<String>) -> Result<
             let still = s.active().map(|d| crate::type_extra_cmds::missing_fonts(&d.doc)).unwrap_or_default();
             Ok(json!({
                 "missing": still,
-                "downloaded": installed,
+                "downloaded": downloaded,
                 "failed": b.failed.iter().map(|(f, e)| json!({"family": f, "error": e})).collect::<Vec<_>>(),
                 "notFound": b.not_found,
                 "replaced": replaced,

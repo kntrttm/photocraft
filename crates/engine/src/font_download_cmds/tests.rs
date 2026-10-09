@@ -765,3 +765,31 @@ fn slug_and_file_name_validation() {
         assert!(!valid_file_name(bad), "{bad:?}");
     }
 }
+
+// ------------------------------------------------------------------ already available
+
+#[test]
+fn a_family_that_is_already_available_is_never_downloaded() {
+    // "Inter" ships with the app.
+    let inter = Fam { name: "Inter", dir: "inter", files: vec![("Regular.ttf", font_named("Inter"), 400)], ps: "InterSans" };
+    let mut r = Rig::new("avail", &[inter]);
+    r.run("type.fonts.catalog", json!({"limit": 1})).unwrap();
+    let calls = r.fetcher.calls().len();
+    let i = r.run("type.fonts.install", json!({"family": "Inter"})).unwrap();
+    assert_eq!(i["alreadyAvailable"], true);
+    assert_eq!((i["files"].as_u64(), i["bytes"].as_u64()), (Some(0), Some(0)));
+    assert_eq!(i["families"], json!(["Inter"]));
+    assert!(i["message"].as_str().is_some_and(|m| m.contains("already available")));
+    assert_eq!(r.fetcher.calls().len(), calls, "nothing is fetched: {:?}", r.fetcher.calls());
+    assert!(r.store.on_disk().is_empty());
+    assert!(r.run("type.fonts.installed", json!({})).unwrap()["families"].as_array().unwrap().is_empty());
+
+    // Resolve Missing Fonts: the PostScript-named layer maps to the available family, no download.
+    r.run("file.new", json!({"width": 100, "height": 60})).unwrap();
+    r.run("type.create", json!({"x": 5, "y": 30, "text": "A", "size": 20, "font": "InterSans-W400"})).unwrap();
+    let d = r.run("type.resolveMissingFonts", json!({"download": true})).unwrap();
+    assert_eq!(d["downloaded"], json!([]));
+    assert_eq!(d["replaced"], 1);
+    assert_eq!(r.fetcher.calls().len(), calls, "{:?}", r.fetcher.calls());
+    assert!(r.store.on_disk().is_empty());
+}
