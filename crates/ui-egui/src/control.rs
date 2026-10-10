@@ -1181,7 +1181,7 @@ mod tests {
         assert_eq!(r["ok"], true, "{r}");
         assert_eq!(app.ui.tool, Tool::Move);
         assert_eq!(app.ui.fonts.query, "roboto");
-        assert_eq!(serde_json::to_value(&app.ui.fonts.tab).unwrap_or_default(), json!("findMore"));
+        assert_eq!(serde_json::to_value(app.ui.fonts.tab).unwrap_or_default(), json!("findMore"));
         // Wrong types and unknown nested keys are errors, not silent no-ops with ok:true.
         for params in [
             json!({"panels": "x"}),
